@@ -13,10 +13,7 @@ use DB;
 
 class EmployerController extends Controller
 {
-<<<<<<< HEAD
     
-=======
->>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
     public function employerRegister(Request $request)
     {
         $latestEmployer = Employer::latest('id')->first();

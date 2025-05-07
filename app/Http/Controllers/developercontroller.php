@@ -64,6 +64,7 @@ class developercontroller extends Controller
                     'password'=>Hash::make($request->post('password')),
                     'show_password'=>$request->post('password'),
                     'profile_complete'=>30,
+                    'developer_status'=>"Inactive",
                     'date'=>date('y/m/d')
                 );
 
@@ -550,13 +551,8 @@ class developercontroller extends Controller
         foreach ($data as $d) {
             $total = $d->profile_complete;
             $profile_complete = $total;
-<<<<<<< HEAD
            // if (empty($d->job)||empty($d->total_hours) && $total < 90) {
             if ($total <= 90) {
-=======
-
-            if ((empty($d->job) || empty($d->total_hours)) && $total < 90) {
->>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
                 $profile_complete = $total + 10;
 
                 // Cap to 100
@@ -642,12 +638,7 @@ class developercontroller extends Controller
         ]);
     }
 
-<<<<<<< HEAD
    public function developer_resource()
-=======
-
-    public function developer_resource()
->>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
     {   
         $developer_id=Session::get('developer_login_id'); 
 
@@ -670,6 +661,8 @@ class developercontroller extends Controller
         $developer_id=Session::get('developer_login_id'); 
 
         $show['resource_details'] = DB::table('developer_order_tb')->where('dev_id',$developer_id)->orderby('id','desc')->get();
+
+        $show['tax'] = DB::table('developer_premium_price_table')->first();
         
         $show['premium'] = Premium::all();
         
@@ -1353,7 +1346,6 @@ class developercontroller extends Controller
 {
     $dev_id = Session::get('developer_login_id');   
 
-<<<<<<< HEAD
         $data = DB::table('developer_details_tb')->where('dev_id',$dev_id)->get();
 
         foreach ($data as $d) {
@@ -1427,9 +1419,6 @@ class developercontroller extends Controller
             session(['message' =>'danger', 'devkycerrmsg'=>'KYC Details Add Failed.']); 
             return redirect()->back();
         }
-=======
-    $data = DB::table('developer_details_tb')->where('dev_id', $dev_id)->get();
->>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
 
     foreach ($data as $d) {
         $total = $d->profile_complete;

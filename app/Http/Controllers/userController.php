@@ -13,11 +13,7 @@ use Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Http;
-=======
-use URL;
->>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
 
 class userController extends Controller
 {
@@ -155,11 +151,7 @@ class userController extends Controller
 	            
 	            $files = [
                     public_path('front/assets/images/Logo-01.png'),
-<<<<<<< HEAD
                     // url::$link,
-=======
-                    URL::$link,
->>>>>>> 8162c8f4131b7ea877cd124a489e48e40d8cb9da
                 ];
                 
 

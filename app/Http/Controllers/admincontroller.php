@@ -1853,6 +1853,7 @@ class admincontroller extends Controller
         }else{
             $data=array(
                 'login_status'=>1,
+                'developer_status'=>"Active",
             );
         
             $info_delete=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($data);

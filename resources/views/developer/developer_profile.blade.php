@@ -448,11 +448,23 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ asset('public/upload/developer/'.$s->image) }}" 
-                                                     class="rounded-circle mr-3" 
-                                                     width="40" 
-                                                     height="40" 
-                                                     alt="{{ $s->name }}">
+                                               
+                                                @if($s->portfolio_image)
+                                                    <img src="{{ asset('public/upload/portfolio/'.$s->portfolio_image ) }}" 
+                                                        class="rounded-circle mr-3" 
+                                                        width="40" 
+                                                        height="40" 
+                                                        alt="{{ $s->name }}"
+                                                    >
+                                                @else
+                                                    <img src="{{ asset('public/upload/profile_image/1640871620.png') }}" 
+                                                        class="rounded-circle mr-3" 
+                                                        width="40" 
+                                                        height="40" 
+                                                        alt="{{ $s->name }}"
+                                                    >
+                                                @endif
+                                               
                                                 <div>
                                                     <strong>{{ $s->name }} {{ $s->last_name }}</strong>
                                                     <div class="text-muted small">{{ $s->heading }}</div>
@@ -493,12 +505,6 @@
                                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                                                     <a class="dropdown-item" href="{{ route('developer_profile_update_details') }}">
                                                         <i class="fas fa-edit mr-2"></i> Edit
-                                                    </a>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="fas fa-share-alt mr-2"></i> Share
-                                                    </a>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="fas fa-download mr-2"></i> Export
                                                     </a>
                                                 </div>
                                             </div>

@@ -80,12 +80,13 @@
 <script>
     function pay()
     {
-        plan = $("#planPay").val();
-        var id = $('#planPay option:selected').data('price');
-
+        let plan = parseInt($("#planPay").val());
+        let taxRate = {{ $tax->tax }}; // This is passed from Blade to JS
+        let tax = plan * (taxRate / 100);
+        let total = plan + tax;
         var options = {
             "key": "{{ env('RAZORPAY_KEY') }}",
-            "amount": plan*100, // in paise
+            "amount": total*100, // in paise
             "currency": "INR",
             "name": "Mellow Academy",
             "description": "Test Transaction",

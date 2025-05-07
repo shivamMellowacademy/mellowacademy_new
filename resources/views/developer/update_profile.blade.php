@@ -100,13 +100,13 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group bmd-form-group">
-                                        <label class="bmd-label-floating">Enter Per Hr <span
+                                        <label class="bmd-label-floating">Enter Monthly Payout <span
                                                 class="text-danger">*</span></label>
                                         <input type="hidden" class="form-control" name="update"
                                             value="<?php echo $s->dev_id; ?>" autocomplete="off" required="">
                                         <input type="perhr" class="form-control" name="perhr"
                                             value="<?php echo $s->perhr; ?>" autocomplete="off"
-                                            placeholder="Enter Per Hours">
+                                            placeholder="Enter Monthly Payout">
                                         <span class="text-danger error-text perhr_error"></span>
                                         @if ($errors->has('perhr'))
                                         <strong class="text-danger">{{ $errors->first('perhr') }}</strong>
@@ -148,13 +148,13 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group bmd-form-group">
-                                        <label class="bmd-label-floating">Enter Rating <span
+                                        <label class="bmd-label-floating">Enter Rating your self (Outof 5)<span
                                                 class="text-danger">*</span></label>
                                         <input type="hidden" class="form-control" name="update"
                                             value="<?php echo $s->dev_id; ?>" autocomplete="off" required="">
                                         <input type="text" class="form-control" name="rating"
                                             value="<?php echo $s->rating; ?>" autocomplete="off"
-                                            placeholder="Enter Rating">
+                                            placeholder="Enter Rating your self (Outof 5)">
                                         <span class="text-danger error-text rating_error"></span>
                                         @if ($errors->has('rating'))
                                         <strong class="text-danger">{{ $errors->first('rating') }}</strong>
@@ -211,9 +211,12 @@
                                             autocomplete="off">
                                         <input type="hidden" class="form-control" name="old_portfolio_image"
                                             value="<?php echo $s->portfolio_image; ?>" autocomplete="off">
-                                        <img class="img-fluid img-thumbnail"
-                                            src="<?php echo URL::asset('public/upload/portfolio/'.$s->portfolio_image.'') ?>"
-                                            style="height:30px;width:40px;">
+                                        @if($s->portfolio_image)
+                                            <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/portfolio/'.$s->portfolio_image.'') ?>" style="height:30px;width:40px;">
+                                        @else
+                                            <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/profile_image/1640871620.png') ?>" style="height:30px;width:40px;">
+                                        @endif
+                                        
                                         @if ($errors->has('portfolio_image'))
                                         <strong class="text-danger">{{ $errors->first('portfolio_image') }}</strong>
                                         @endif
@@ -225,7 +228,10 @@
                                         <label class="bmd-label-floating">Choose Resume</label>
                                         <input type="file" class="form-control" name="resume" autocomplete="off">
                                         <input type="hidden" class="form-control" name="old_resume" autocomplete="off">
-                                        <?php echo $s->resume; ?>
+                                        
+                                        @if($s->resume)
+                                            <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/resume/'.$s->resume.'') ?>" style="height:30px;width:40px;">
+                                        @endif
                                         @if ($errors->has('resume'))
                                         <strong class="text-danger">{{ $errors->first('resume') }}</strong>
                                         @endif
@@ -274,11 +280,16 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="form-group bmd-form-group">
+                                    <div class="form-group bmd-form-group" id="loader-button">
                                         <button type="submit" class="btn btn-success btn-block">Update</button>
+                                    </div>
+                                    <div id="loader" style="display: none; text-align:center; margin-top:20px;">
+                                        <img src="{{ asset('public/upload/1746529029853.gif') }}" alt="Loading..." style="height: 40px;">
                                     </div>
                                 </div>
                             </div>
+
+                           
                         </form>
 
                         <?php
@@ -309,6 +320,8 @@ $(document).ready(function() {
         var formData = new FormData(form);
 
         $('.error-text').text(''); // clear old errors
+        $('#loader').show(); // Show loader
+        $('#loader-button').hide(); // hide loader
 
         $.ajax({
             url: "{{ route('developer_profile_update') }}",
@@ -317,11 +330,15 @@ $(document).ready(function() {
             contentType: false,
             processData: false,
             success: function(response) {
+                $('#loader').hide(); // Hide loader
+                $('#loader-button').show(); // show loader
                 if (response.status === 200) {
                     toastr.success(response.message);
                 }
             },
             error: function(xhr) {
+                $('#loader').hide(); // Hide loader
+                $('#loader-button').show(); // show loader  
                 if (xhr.status === 422) {
                     $.each(xhr.responseJSON.errors, function(key, value) {
                         $('.' + key + '_error').text(value[0]);
