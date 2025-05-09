@@ -1,111 +1,77 @@
 @extends('front.layout')
 @section('content')
-      
-    <section class="checkout">
-        
-            <header>
-                <div class="container">
-                    <h2 class="title text-dark">Hire Now!</h2>
-                    <div class="text text-dark">
-                        <p>Proceed To Hiring!</p>
+
+<section class="checkout py-5">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="text-dark">Hire Now!</h2>
+            <p class="text-muted">Proceed To Hiring!</p>
+        </div>
+
+        @php
+            $id = Session::get('user_login_id');
+            $tperhr = 0;
+        @endphp
+
+        <div class="row">
+            @foreach($developer_cart as $dcart)
+                @php
+                    $dev_id = $dcart->dev_id;
+                    $tperhr += $dcart->perhr;
+                    session(['dev_id' => $dev_id]);
+                    session(['tperhr' => $tperhr]);
+                @endphp
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="d-flex justify-content-center align-items-center" style="height: 200px; overflow: hidden;">
+                            @if($dcart->image)
+                                <img src="{{ URL::asset('public/upload/developer/' . $dcart->image) }}" 
+                                    class="img-fluid mx-auto d-block" 
+                                    alt="{{ $dcart->name }}"
+                                    style="max-height: 100%; width: auto;">
+                            @else
+                                <img src="{{ URL::asset('public/upload/profile_image/1640871620.png') }}" 
+                                    class="img-fluid mx-auto d-block" 
+                                    alt="Developer Avatar"
+                                    style="max-height: 100%; width: auto;">
+                            @endif
+                        </div>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title text-dark text-center">{{ $dcart->name }}</h5>
+                            <p class="card-text text-center text-muted">
+                                @foreach($developer_cart_deatls as $p)
+                                    @if($dcart->pro_id === $p->id)
+                                        {{ $p->heading }}
+                                    @endif
+                                @endforeach
+                            </p>
+                            <div class="text-center">
+                                <span class="badge badge-success p-2">
+                                    INR {{ $dcart->perhr + ($dcart->perhr * $tax->tax / 100) }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </header>
+            @endforeach
+        </div>
 
-            <div class="container">            
-                <div class="cart-wrapper">
-                    <div class="cart-block cart-block-header clearfix">
-                        <div><span></span></div>
-                        <div class="text-center"><span></span></div>
-                        <div class="text-center"><span></span></div>
-                        <div class="text-center"><span></span></div>
-                        <div class="text-center"><span></span></div>
-                    </div>
-                    <?php 
-                    $id= Session::get('user_login_id');
-                    $tperhr=0;
-                    foreach($developer_cart as $dcart) { 
-                       
-                        $dev_id=$dcart->dev_id;
-                        $tperhr+=$dcart->perhr;
-                        session(['dev_id' => $dev_id]);
-                        session(['tperhr' => $tperhr]);
-                        
-                    ?>
-                    <div class="clearfix">
-                        <div class="cart-block cart-block-item clearfix">
-                            <div class="image">
-                                <a href="#"><img src="<?php echo URL::asset('public/upload/developer/'.$dcart->image);?>" alt="" /></a>
-                            </div>
-                            <div class="title">
-                              <div class="h6 text-center text-dark"><a href=""><?php echo $dcart->name; ?></a></div>
-                            </div>
-
-                           <div class="title">
-                                <div class="text-center text-dark"><?php foreach($developer_cart_deatls as $p) {
-                                        if($dcart->pro_id === $p->id ) { ?>
-                                           <?php echo $p->heading; ?>
-
-                                    <?php } }?> </div>
-                                <div></div>
-                            </div>
-
-                            <!-- <div class="quantity">
-                                <div >
-                                    <?php foreach($developer_cart_deatls as $p) {
-                                        if($dcart->pro_id === $p->id ) { ?>
-                                           
-                                   ( <?php echo $dcart->rating; ?>/5 )
-                                   <?php } } ?>
-
-                               </div>
-                            </div> -->
-
-                            <div class="price">
-                                <span class="final"></span>
-                                <span class="text-center text-dark">
-                                  INR <?php echo ($dcart->perhr)*10/100+$dcart->perhr; ?>
-                                </span> 
-                            </div>
-                       
-
-                            <!-- <div class="price">
-                                <span class="text-center">< ?php echo $dcart->perhr; ?> INR</span>
-                            </div> -->
-                           <!--  <a href="< ?php echo route('delete_developer_cart',['dev_id'=>''.$dcart->dev_id.'']) ?>"><span class="icon icon-cross icon-delete"></span></a> -->
-                        </div>
-                    </div>
-                    <?php 
-                    } ?>
-                    <div class="row">
-                        <div class="col-md-4 offset-md-8">
-                          
-                            <div class="cart-block cart-block-footer clearfix">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="clearfix">
-                        
-
-                        
-                        <div class="row">
-                            <div class="col-4">
-                                
-                            </div>
-                            <div class="col-8 text-right">
-                                <a href="{{route('developer_proceed_checkout')}}" class="btn btn-outline-warning text-dark"><span class="icon icon-cart"></span> Proceed to Hire</a>
-                            </div>
-                        </div>
-                        
-
-                    </div>
+        @if(count($developer_cart) > 0)
+            <div class="row mt-4">
+                <div class="col-md-12 text-right">
+                    <a href="{{ route('developer_proceed_checkout') }}" class="btn btn-warning btn-lg">
+                        <i class="fa fa-shopping-cart mr-2"></i> Proceed to Hire
+                    </a>
                 </div>
-
-                
-            </div> 
-
-      
+            </div>
+        @else
+            <div class="text-center">
+                <p class="text-muted">No developers added to hire.</p>
+            </div>
+        @endif
+    </div>
 </section>
 
 @endsection

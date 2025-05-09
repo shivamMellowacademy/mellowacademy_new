@@ -73,6 +73,7 @@ class cartcontroller extends Controller
     {
         $u_id=Session::get('user_login_id');
         $show['web_details'] = DB::table('web_setting')->get();
+        $show['tax'] = DB::table('developer_premium_price_table')->first();
         $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
         $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
         $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count(); 
@@ -95,6 +96,7 @@ class cartcontroller extends Controller
     {   
     	$show['developer_order_details']=$this->developer_order_data();
         $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+        $show['tax'] = DB::table('developer_premium_price_table')->first(); 
         $show['about'] = DB::table('about_tb')->orderby('id','desc')->get(); 
     	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
         $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
@@ -208,30 +210,30 @@ class cartcontroller extends Controller
         $company_id = 1;
         $role_id = null;
         
-        if ($user_email) {
-            $companyApiUrl = 'https://gulbug.com/staging/mellow_backend/public/api/get-employer-company';
+        // if ($user_email) {
+        //     $companyApiUrl = 'https://gulbug.com/staging/mellow_backend/public/api/get-employer-company';
         
-            $companyApiResponse = Http::withoutVerifying()->get($companyApiUrl, [
-                'email' => $user_email,
-            ]);
+        //     $companyApiResponse = Http::withoutVerifying()->get($companyApiUrl, [
+        //         'email' => $user_email,
+        //     ]);
         
-            if ($companyApiResponse->successful()) {
-                $apiData = $companyApiResponse->json();
+        //     if ($companyApiResponse->successful()) {
+        //         $apiData = $companyApiResponse->json();
         
-                // Check if 'employer_data' and 'company_id' exist
-                if (isset($apiData['employer_data']['company_id'])) {
-                    $company_id = $apiData['employer_data']['company_id'];
-                }
+        //         // Check if 'employer_data' and 'company_id' exist
+        //         if (isset($apiData['employer_data']['company_id'])) {
+        //             $company_id = $apiData['employer_data']['company_id'];
+        //         }
         
-                // Check if role_id exists at root level
-                if (isset($apiData['role_id'])) {
-                    $role_id = $apiData['role_id'];
-                }
+        //         // Check if role_id exists at root level
+        //         if (isset($apiData['role_id'])) {
+        //             $role_id = $apiData['role_id'];
+        //         }
         
-            } else {
-                \Log::error('Company API failed: ' . $companyApiResponse->body());
-            }
-        }
+        //     } else {
+        //         \Log::error('Company API failed: ' . $companyApiResponse->body());
+        //     }
+        // }
 
         
         
@@ -277,44 +279,44 @@ class cartcontroller extends Controller
                 "add_more" => "false"
             ];
             
-            $response = Http::withoutVerifying()
-                ->post('https://gulbug.com/staging/mellow_backend/public/api/employees', $employeeData);
+            // $response = Http::withoutVerifying()
+            //     ->post('https://gulbug.com/staging/mellow_backend/public/api/employees', $employeeData);
                 
-                if ($response->successful()) {
-                // Send email to developer after account setup
-                $email = $developer->email;
-                $dev_name = $developer->name ?? 'Developer';
+            //     if ($response->successful()) {
+            //     // Send email to developer after account setup
+            //     $email = $developer->email;
+            //     $dev_name = $developer->name ?? 'Developer';
             
-                $emailData = [
-                    'name' => $dev_name,
-                    'login_url' => 'https://gulbug.com/staging/mellow_backend/public/login',
-                    'reset_url' => 'https://gulbug.com/staging/mellow_backend/public/forgot-password'
-                ];
+            //     $emailData = [
+            //         'name' => $dev_name,
+            //         'login_url' => 'https://gulbug.com/staging/mellow_backend/public/login',
+            //         'reset_url' => 'https://gulbug.com/staging/mellow_backend/public/forgot-password'
+            //     ];
             
-                Mail::send([], [], function ($message) use ($email, $emailData) {
-                    $message->to($email)
-                        ->from('dev@mellowelements.in', 'The Mellow Elements')
-                        ->subject('Your Account is Ready - Mellow Elements')
-                        ->setBody(
-                        '<p>Hello ' . $emailData['name'] . ',</p>' .
-                        '<p>Your account has been successfully set up on Mellow Elements.</p>' .
-                        '<p>You can log in using the link below:</p>' .
-                        '<p><a href="' . $emailData['login_url'] . '">' . $emailData['login_url'] . '</a></p>' .
-                        '<p>If you are not able to log in, you can reset your password using the link below:</p>' .
-                        '<p><a href="' . $emailData['reset_url'] . '">' . $emailData['reset_url'] . '</a></p>' .
-                        '<p>Welcome aboard!</p>' .
-                        '<p>- The Mellow Elements Team</p>',
-                        'text/html'
-                    );
-                });
+            //     Mail::send([], [], function ($message) use ($email, $emailData) {
+            //         $message->to($email)
+            //             ->from('dev@mellowelements.in', 'The Mellow Elements')
+            //             ->subject('Your Account is Ready - Mellow Elements')
+            //             ->setBody(
+            //             '<p>Hello ' . $emailData['name'] . ',</p>' .
+            //             '<p>Your account has been successfully set up on Mellow Elements.</p>' .
+            //             '<p>You can log in using the link below:</p>' .
+            //             '<p><a href="' . $emailData['login_url'] . '">' . $emailData['login_url'] . '</a></p>' .
+            //             '<p>If you are not able to log in, you can reset your password using the link below:</p>' .
+            //             '<p><a href="' . $emailData['reset_url'] . '">' . $emailData['reset_url'] . '</a></p>' .
+            //             '<p>Welcome aboard!</p>' .
+            //             '<p>- The Mellow Elements Team</p>',
+            //             'text/html'
+            //         );
+            //     });
 
-            }
+            // }
 
             
             // Optional: log if request fails
-            if (!$response->successful()) {
-                \Log::error('API Error - Employee Sync Failed: ' . $response->body());
-            }
+            // if (!$response->successful()) {
+            //     \Log::error('API Error - Employee Sync Failed: ' . $response->body());
+            // }
 
             // by shankar end
             $userLogin = DB::table('user_login')->where('id', $u_id)->first();
@@ -770,7 +772,7 @@ class cartcontroller extends Controller
     	 //echo $show['developer_resources']; exit();
     	 
     	$show['developer_resources'] = DB::table('developer_order_tb')
-    	->select('developer_details_tb.name','developer_details_tb.last_name','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.education','developer_details_tb.rating','developer_details_tb.language','developer_details_tb.address','developer_details_tb.date','developer_details_tb.dev_id','developer_details_tb.degree','developer_details_tb.available_start_date','developer_details_tb.available_end_date'
+    	->select('developer_details_tb.dev_id','developer_details_tb.portfolio_image','developer_details_tb.name','developer_details_tb.last_name','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.education','developer_details_tb.rating','developer_details_tb.language','developer_details_tb.address','developer_details_tb.date','developer_details_tb.dev_id','developer_details_tb.degree','developer_details_tb.available_start_date','developer_details_tb.available_end_date'
 		
 		,'developer_order_tb.interviewlink','developer_order_tb.date','developer_order_tb.interviewdateone','developer_order_tb.interviewdatetwo',
 

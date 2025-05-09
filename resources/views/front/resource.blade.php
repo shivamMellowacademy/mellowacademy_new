@@ -434,9 +434,11 @@
                     </div>
                     
                     <div class="text-center">
-                        <img src="{{ asset('public/upload/developer/'.$resource->image) }}" 
-                             class="profile-avatar" 
-                             alt="{{ $resource->name }}">
+                    @if(!empty($resource->image))
+                            <img src="{{ asset('public/upload/developer/'.$resource->image) }}"  class="profile-avatar" alt="{{ $resource->name }}">
+                        @else
+                            <img src="{{ URL::asset('public/upload/profile_image/1640871620.png') }}"  class="img-fluid mx-auto d-block" alt="Developer Avatar" style="max-height: 100%; width: auto;">
+                        @endif
                     </div>
                     
                     <div class="p-4">
@@ -473,7 +475,7 @@
                             
                             <div class="detail-item">
                                 <div class="detail-icon">
-                                    <i class="fa fa-money-bill-wave"></i>
+                                    <i class="fa fa-money"></i>
                                 </div>
                                 <div class="detail-content">
                                     <div class="detail-label">Rate</div>
@@ -486,7 +488,7 @@
                         <div class="detail-card bg-light-warning">
                             <div class="detail-item">
                                 <div class="detail-icon bg-warning-light">
-                                    <i class="fa fa-clock text-warning"></i>
+                                    <i class="fa fa-clock-o text-warning"></i>
                                 </div>
                                 <div class="detail-content">
                                     <div class="detail-label">Project Timeline</div>
@@ -532,7 +534,7 @@
                         <div class="detail-card">
                             <div class="d-flex align-items-center mb-3">
                                 <div class="detail-icon bg-primary-light">
-                                    <i class="fa fa-calendar-alt text-primary"></i>
+                                    <i class="fa fa-calendar text-primary"></i>
                                 </div>
                                 <h5 class="mb-0 ml-3 text-dark">Available Time Slots</h5>
                             </div>
@@ -652,7 +654,7 @@
                             
                             <div class="detail-item">
                                 <div class="detail-icon bg-primary-light">
-                                    <i class="fa fa-calendar-day text-primary"></i>
+                                    <i class="fa fa-calendar text-primary"></i>
                                 </div>
                                 <div class="detail-content">
                                     <div class="detail-label">Date & Time</div>
@@ -753,7 +755,7 @@
                                 </div>
                                 <div class="col-md-5 text-center">
                                     <div class="p-4 bg-light rounded">
-                                        <h4 class="text-primary mb-3">{{ $resource->perhr }} INR</h4>
+                                        <h4 class="text-primary mb-3">{{ number_format($resource->perhr, 2) }} INR</h4>
                                         <a href="{{ route('dev.pay', ['dev_id' => $resource->dev_id]) }}" 
                                            class="action-btn btn-primary btn-block">
                                             <i class="fa fa-lock mr-2"></i>Proceed to Payment

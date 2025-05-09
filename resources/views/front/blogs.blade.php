@@ -14,7 +14,7 @@
                         <li class="breadcrumb-item"><a href="#">Blogs</a></li>
                     </ol>
                     <h2 class="title">Blog grid</h2>
-                    <div class="text">
+                    <div class="text text-dark">
                         <p>Suspendisse scelerisque odio eu felis eleifend</p>
                     </div>
                 </div>

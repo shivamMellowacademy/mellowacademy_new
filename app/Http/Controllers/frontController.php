@@ -672,7 +672,7 @@ class frontController extends Controller
 
     public function developer_rating_details($dev_id)
     {  
-       $show['developer_order_details']=$this->developer_order_data();
+        $show['developer_order_details']=$this->developer_order_data();
 
         $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
         $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();

@@ -1297,13 +1297,31 @@ class userController extends Controller
     public function dev_details($id)
     {  
     	$show['developer_order_details']=$this->developer_order_data();
-    	$show['developer_details'] = DB::table('developer_details_tb')
-    	->select('higher_professional_tb.id as ids','higher_professional_tb.heading','developer_details_tb.dev_id','developer_details_tb.pro_id','developer_details_tb.name','developer_details_tb.description','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.rating')
-        ->join('higher_professional_tb','higher_professional_tb.id' , '=' , 'developer_details_tb.pro_id')
-    	->where('developer_details_tb.pro_id',$id)
-    	->where('developer_details_tb.login_status',1)
-    	->orderby('developer_details_tb.dev_id','desc')
-    	->get();
+    	$orderedDevIds = DB::table('developer_order_tb')
+    ->pluck('dev_id');
+
+$show['developer_details'] = DB::table('developer_details_tb')
+    ->select(
+        'higher_professional_tb.id as ids',
+        'higher_professional_tb.heading',
+        'developer_details_tb.dev_id',
+        'developer_details_tb.pro_id',
+        'developer_details_tb.name',
+        'developer_details_tb.description',
+        'developer_details_tb.image',
+        'developer_details_tb.phone',
+        'developer_details_tb.email',
+        'developer_details_tb.job',
+        'developer_details_tb.perhr',
+        'developer_details_tb.rating'
+    )
+    ->join('higher_professional_tb', 'higher_professional_tb.id', '=', 'developer_details_tb.pro_id')
+    ->where('developer_details_tb.pro_id', $id)
+    ->where('developer_details_tb.login_status', 1)
+    ->whereNotIn('developer_details_tb.dev_id', $orderedDevIds)
+    ->orderBy('developer_details_tb.dev_id', 'desc')
+    ->groupBy('developer_details_tb.dev_id')
+    ->get();
 
     	$show['developer'] = DB::table('developer_details_tb')
     	->select('higher_professional_tb.id as ids','higher_professional_tb.heading','developer_details_tb.dev_id','developer_details_tb.pro_id','developer_details_tb.name','developer_details_tb.description','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.rating')

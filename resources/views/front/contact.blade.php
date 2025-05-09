@@ -18,8 +18,8 @@
                                 <figure class="text-center">
                                     <span class="icon icon-map-marker"></span>
                                     <figcaption>
-                                        <strong>Address</strong>
-                                        <span><?php echo $con->address; ?></span>
+                                        <strong class="text-dark">Address</strong>
+                                        <span class="text-dark"><?php echo $con->address; ?></span>
                                     </figcaption>
                                 </figure>
                             </div>
@@ -27,8 +27,8 @@
                                 <figure class="text-center">
                                     <span class="icon icon-phone"></span>
                                     <figcaption>
-                                        <strong>Call us</strong>
-                                        <span>
+                                        <strong class="text-dark">Call us</strong>
+                                        <span class="text-dark">
                                             <?php echo $con->phone; ?>
                                                                                         
                                         </span>
@@ -39,8 +39,8 @@
                                 <figure class="text-center">
                                     <span class="icon icon-envelope"></span>
                                     <figcaption>
-                                        <strong>Email</strong>
-                                        <span>
+                                        <strong class="text-dark">Email</strong>
+                                        <span class="text-dark">
                                             <?php echo $con->email; ?>
                                            
                                         </span>

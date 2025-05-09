@@ -11,9 +11,9 @@
         </header>
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12" style="color: #000 !important;">
                     <!--<h4>Divano Store</h4>-->
-                    <p><?php echo $t->description; ?></p>
+                    <p class="text-dark"><?php echo $t->description; ?></p>
                 </div>
             </div>
         </div>

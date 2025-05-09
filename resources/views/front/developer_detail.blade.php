@@ -48,7 +48,7 @@
                                         <i class="fa fa-star @if($i <= $d->rating) filled @endif"></i>
                                     @endfor
                                 </div>
-                                <span class="text-dark">{{ $d->rating }}/5</span>
+                                <!-- <span class="text-dark">{{ $d->rating }}/5</span> -->
                             </div>
                         </div>
                         
@@ -56,7 +56,7 @@
                             @if( $d->language)
                                 <div class="stat-item">
                                     <i class="fa fa-language"></i>
-                                    <!-- <span class="text-dark">{{ $d->language }}</span> -->
+                                    <span class="text-dark">{{ $d->language }}</span>
                                 </div>
                             @endif
                             @if( $d->perhr)
@@ -83,6 +83,9 @@
                                         <a href="{{route('login')}}" class="btn btn-hire">
                                             <i class="fa fa-handshake"></i> Hire Now
                                         </a>
+                                        <a href="{{ route('developer_rating_details',['dev_id'=>$d->dev_id] ) }}" class="btn btn-view">
+                                            <i class="fa fa-eye"></i> Full Profile
+                                        </a>
                                     @else
                                         @if($hire_dev > 0)
                                             <a href="{{ route('developer_rating_details',['dev_id'=>$d->dev_id] ) }}" class="btn btn-view">
@@ -91,6 +94,9 @@
                                         @else
                                             <a href="{{route('developer_checkout', $d->dev_id)}}" class="btn btn-hire">
                                                 <i class="fa fa-handshake"></i> Hire Now
+                                            </a>
+                                             <a href="{{ route('developer_rating_details',['dev_id'=>$d->dev_id] ) }}" class="btn btn-view">
+                                                <i class="fa fa-eye"></i> Full Profile
                                             </a>
                                         @endif
                                     @endif
@@ -112,9 +118,7 @@
                                 </span>
                             @endif
                             
-                            <a href="{{ route('developer_rating_details',['dev_id'=>$d->dev_id] ) }}" class="btn btn-view">
-                                <i class="fa fa-eye"></i> Full Profile
-                            </a>
+
                         @endforeach
                     </div>
                 </div>
@@ -154,7 +158,7 @@
                                 <h3 class="section-title">About Me</h3>
                                 @foreach($deve as $d)
                                 <div class="section-content">
-                                    {!! nl2br(e($d->description)) !!}
+                                    {!! $d->description !!}
                                 </div>
                                 @endforeach
                             </div>
@@ -167,7 +171,7 @@
                                 @foreach($deve as $d)
                                 <div class="skills-container">
                                     @foreach(explode(',', $d->skills) as $skill)
-                                    <span class="skill-tag">{{ trim($skill) }}</span>
+                                    <span class="skill-tag">{!! trim($skill) !!}</span>
                                     @endforeach
                                 </div>
                                 @endforeach
@@ -180,7 +184,7 @@
                                 <h3 class="section-title">Work Experience</h3>
                                 @foreach($deve as $d)
                                 <div class="experience-list">
-                                    {!! nl2br(e($d->completed_job)) !!}
+                                    {!! $d->completed_job !!}
                                 </div>
                                 @endforeach
                                 
@@ -336,6 +340,26 @@
     
     .availability-badge.unavailable {
         background: #F44336;
+    }
+
+    .section-content {
+        line-height: 1.8;
+        color: #555;
+        white-space: pre-line; /* This respects both \n and <br> tags */
+        word-wrap: break-word; /* Breaks long words if needed */
+        overflow-wrap: break-word; /* Modern version of word-wrap */
+    }
+
+    .section-content p {
+        margin-bottom: 1em;
+    }
+    /* For all text content areas to handle line breaks */
+    .experience-list,
+    .skills-container,
+    .stat-info p {
+        white-space: pre-line;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .developer-info {
@@ -538,6 +562,17 @@
     .section-content {
         line-height: 1.8;
         color: #555;
+        p {
+            margin-bottom: 1.2em;
+        }
+        /* Style lists if present */
+        ul, ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
     }
     
     /* Skills */

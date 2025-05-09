@@ -5,11 +5,11 @@
 
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12" style="color: #000 !important;">
                     <?php
                     foreach($license as $clic) { ?>
-                    <h4><?php echo $clic->heading; ?></h4>
-                    <p><?php echo $clic->description; ?></p>
+                    <h4 style="color: #000;"><?php echo $clic->heading; ?></h4>
+                    <p style="color: #000;"><?php echo $clic->description; ?></p>
                     
                     <?php
                     } ?> 

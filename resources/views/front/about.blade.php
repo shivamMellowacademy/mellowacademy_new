@@ -10,7 +10,7 @@
           foreach($about as $a) { ?>  
       <h2 class="title"><?php echo $a->heading; ?></h2>
       <?php } ?>
-      <div class="text">
+      <div class="text-dark">
         <?php
           foreach($about as $a) { ?>
             <p><?php echo $a->description; ?></p>
@@ -33,9 +33,9 @@
   <center>
         <header class="blog_header">
             <div class="container">
-                <h2 class="h2 title">MEET THE TEAM</h2>
+                <h2 class="h2 title text-dark">MEET THE TEAM</h2>
                 <div class="text">
-                    <p>Hire High-Performance Individual/Team, On Your Terms</p>
+                    <p class="text-dark">Hire High-Performance Individual/Team, On Your Terms</p>
                 </div>
             </div>
         </header>
@@ -46,8 +46,8 @@
       <img src="{{ URL::asset('public/upload/team/nikhil.jpeg') }}" alt="Blog">
     </div>
     <div class="blog-details">
-      <h4>MEET THE CEO</h4>
-      <p>THROW HIM A CURVE BALL AND SEE HIS IDEAS
+      <h4 class="text-dark">MEET THE CEO</h4>
+      <p class="text-dark">THROW HIM A CURVE BALL AND SEE HIS IDEAS
             THRIVE IN ACTION. NIKHIL IS UNRELENTING IN
             BREAKING DOWN COMPLEX ISSUES TO THEIR LAST
             THREAD. HE BRINGS AN INTERDISCIPLINARY
@@ -68,10 +68,10 @@
     </div>
     
   </div>
-  <div class="blog-box">
-    <div class="blog-details">
-      <h4>MEET THE CTO</h4>
-      <p>VIKASH KNOWS THE TACTIC TO FIX ALL. HE IS
+  <div class="blog-box text-dark">
+    <div class="blog-details text-dark">
+      <h4 class="text-dark">MEET THE CTO</h4>
+      <p class="text-dark">VIKASH KNOWS THE TACTIC TO FIX ALL. HE IS
         A DOER AND HAS RICH EXPERIENCE OF
         WORKING WITH ONE OF THE TECH GIANTS IN
         THE COUNTRY. HE HAS DELIVERED 100+
@@ -85,7 +85,7 @@
         SOLVING. DON’T MISJUDGE HIM TO BE A TECHGEEK AS HE HAS ALSO ORGANISED LARGE
         SCALE HAPPENING EVENTS IN THE PAST AS
         WELL.</p>
-      <a href="#">Vikash Kumar Pandit</a>
+      <a href="#" class="text-dark">Vikash Kumar Pandit</a>
     </div>
     <div class="blog-image">
       <img src="{{ URL::asset('public/upload/team/vixcy.jpg') }}" alt="Blog">
@@ -96,9 +96,9 @@
     <div class="blog-image">
       <img src="{{ URL::asset('public/upload/team/Sumit Photo 1.jpg') }}" alt="Blog">
     </div>
-    <div class="blog-details">
-      <h4>MEET THE CFO</h4>
-      <p> SUMIT TRULY KNOWS HOW TO LEAD FROM THE
+    <div class="blog-details text-dark">
+      <h4 class="text-dark">MEET THE CFO</h4>
+      <p class="text-dark"> SUMIT TRULY KNOWS HOW TO LEAD FROM THE
             FRONT WITH HIS 18+ YEARS OF LEADERSHIP
             EXPERIENCE WITH CORPORATE GIANTS SUCH AS
             TRANSUNION CIBIL, HSBC, JP MORGAN, NOMURA,
@@ -116,13 +116,13 @@
             REVOLUTIONIZE THE BLOCKCHAIN AND CRYPTO
             SPACE WITH HIS DYNAMIC LEADERSHIP
             EXPERIENCE, POWERING INNOVATION.</p>
-      <a href="#">Sumit Kumar Gugari</a>
+      <a href="#" >Sumit Kumar Gugari</a>
     </div>
   </div>
   <div class="blog-box">
-    <div class="blog-details">
-      <h4>MEET THE CMO</h4>
-      <p>ASHISH IS A DIGITAL MARKETING AND
+    <div class="blog-details text-dark">
+      <h4 class="text-dark">MEET THE CMO</h4>
+      <p class="text-dark">ASHISH IS A DIGITAL MARKETING AND
             CRYPTOCURRENCY EXPERT. HIS MARKET
             KNOWLEDGE OF ABOUT 13 YEARS IN DIGITAL
             MARKETING AND OVER 5 YEARS IN DEALING
@@ -137,7 +137,7 @@
             THE ENTIRE ECOSYSTEM TO SUPPORT TOKEN/
             COIN IN CRYPTO REALM. IN SHORT OUR
             DIGITAL MARKETING GENIUS.</p>
-      <a href="#">Ashish Kumar Jain</a>
+      <a href="#" class="text-dark">Ashish Kumar Jain</a>
     </div>
     <div class="blog-image">
       <img src="{{ URL::asset('public/upload/team/ashis.jpg') }}" alt="Blog">
@@ -147,9 +147,9 @@
     <div class="blog-image">
       <img src="{{ URL::asset('public/upload/team/sanjay.jpg') }}" alt="Blog">
     </div>
-    <div class="blog-details">
-      <h4>MEET THE CLO</h4>
-      <p> A SEASONED PRACTITIONER SANJAY HAS
+    <div class="blog-details" class="text-dark">
+      <h4 class="text-dark">MEET THE CLO</h4>
+      <p class="text-dark"> A SEASONED PRACTITIONER SANJAY HAS
             MULTIDIMENSIONAL KNOWLEDGE OF
             CORPORATE SECTOR AND IS WELL SKILLED
             IN DRAFTING AND PLEADING ALL KINDS OF
@@ -166,7 +166,7 @@
             PUBLIC ARBITRATION PROCEEDINGS. WALL
             OF OUR COMPANY WE CALL HIM MR.
             DEPENDABLE</p>
-      <a href="#">Sanjay Sonkar</a>
+      <a href="#" class="text-dark">Sanjay Sonkar</a>
     </div>
   </div>
 </section>

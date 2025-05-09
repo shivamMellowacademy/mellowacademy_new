@@ -170,7 +170,7 @@
 
 
 
-    <div class="wrapper">
+   
 
         <nav>
 
@@ -1015,7 +1015,7 @@
 
         </nav>  
 
-
+    <div class="wrapper">
 
         <div class="modal" id="myModal1">
 
@@ -1179,300 +1179,410 @@
 
         </div>     
 
+    </div>
         @yield('content')
 
-
-
-        <footer>
-
-            <div class="container-fluid">
-
-                <div class="footer-wrap">
-
-                    <div class="container">
-
-                        <div class="footer-links">
-
-                            <div class="row">
-
-                                <div class="col-md-2">
-
-                                    <h5>Browse by</h5>
-
-                                    <ul>
-
-                                        <?php $i=1;
-
-                                        foreach($category as $m) {
-
-                                        $url = route('product',['id'=>''.$m->id.'']); ?>
-
-                                            <li><a href="<?php echo $url; ?>"><?php echo $m->name; ?></a></li>
-
-                                        <?php
-
-                                        if ($i++ == 5) break;
-
-                                        } ?>
-
-                                    </ul>
-
-                                </div>
-
-                                <div class="col-md-2">
-
-                                    <h5>Meet Elements</h5>
-
-                                    <ul>
-
-                                        <li><a href="{{route('aboutus')}}">About Us</a></li>
-
-                                        <li><a href="{{route('contact')}}">Contact Us</a></li>
-
-                                        <li><a href="{{route('faq')}}">FAQs</a></li>
-
-                                        <li><a href="{{route('blogs')}}">Blogs</a></li>
-
-                                        <li><a href="{{route('commercial_license')}}">License</a></li>
-
-                                        <li><a href="{{route('developer_registration')}}" target="_blank">Become a Professional</a></li>
-
-                                    </ul>
-
-                                </div>
-
-                                <div class="col-md-2">
-
-                                    <h5>Quick links</h5>
-
-                                    <ul>
-
-                                        
-
-                                        <li><a href="{{route('refund_policy')}}">Refund Policy</a></li>
-
-                                        <li><a href="{{route('privacy')}}">Privacy Policy</a></li>
-
-                                        <li><a href="{{route('term')}}">Terms & Conditions</a></li>
-
-                                        
-
-                                    </ul>
-
-                                    <!--<?php
-
-                                    if(empty(Session::get('user_login_id'))) { ?>
-
-                                        <ul>
-
-                                            <li><a href="#">Order Status </a></li>
-
-                                            <li><a href="#">Order History</a></li>
-
-                                            <li><a href="#">Download</a></li>
-
-                                        </ul>
-
-                                    <?php } else { ?>
-
-                                        <ul>
-
-                                            <li><a href="{{route('show_invoice')}}">Order Status </a></li>
-
-                                            <li><a href="{{route('order_history')}}">Order History</a></li>
-
-                                            <li><a href="{{route('my_download')}}">Download</a></li>
-
-                                        </ul>
-
-                                    <?php } ?>-->
-
-                                </div>
-
-
-
-                                <div class="col-md-2" style="right:10px">
-
-                                    <?php 
-
-                                    foreach ($web_details as $w) { ?>
-
-                                        <img src="<?php echo URL::asset('public/upload/footer/'.$w->footer_logo.'') ?>" alt="" width="170" height="110" style="top: 0px; position: relative;" />
-
-                                    <?php } ?>  
-
-                                </div>
-
-                                
-
-                                <div class="col-md-3">
-
-                                    <h3 class="search-key"><a href="{{route('higher_professional')}}">Search Job | IT jobs | IT company vacancy | Jobs vacancy | Hire employee | Hire IT employee | Hire freelancer | Remote jobs | Hiring near me | Freelance jobs | Find a job | Online jobs from home | Job openings near me | Job opportunities | Mern developer jobs | Mean developer jobs | Flutter developer jobs | .net developer jobs | Laravel developer jobs | Job vacancy near me | Job websites | Experience jobs | Fresher jobs | Job sites | IT recruitment</a></h3>
-
-                                    <h5>Sign up for our newsletter</h5>
-
-                                    <p style="color:#fff">Enter Your Email To Getting Notified About Our Promotional Offers.</p>
-
-                                    <div class="row">
-
-                                        <div class="col-md-12 ml-auto mr-auto">
-
-                                            @if(Session::has('storeerrmsg'))                 
-
-                                                <div class="alert alert-{{Session::get('message')}} alert-dismissible">
-
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>  
-
-                                                    <small>{{Session::get('storeerrmsg')}}</small>
-
-                                                </div>
-
-                                                {{Session::forget('message')}}
-
-                                                {{Session::forget('storeerrmsg')}}
-
-                                            @endif
-
-                                        </div>
-
-                                    </div>
-
-                                    <form class="form-inline" method="post" action="{{route('store')}}">
-
-                                     @csrf
-
-                                        <div class="form-group form-newsletter" style="width:100%">
-
-                                            <input class="form-control" type="text" name="email" value="" placeholder="Email address" />
-
-                                            <button type="submit" class="btn btn-secondary btn-sm">Subscribe</button>
-
-                                        </div>
-
-                                    </form>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="footer-social">
-
-                            <div class="row">
-
-                                <div class="col-sm-6">
-
-                                    <a href="#" onclick="window.open('https://www.sitelock.com/verify.php?site=mellowelements.in','SiteLock','width=600,height=600,left=160,top=170');" ><img class="img-fluid" alt="SiteLock" title="SiteLock" src="https://shield.sitelock.com/shield/mellowelements.in" /></a><br>
-
-                                    <a href="#" target="_blank" style="color:#fff"> Copyright © 2021. All Right Reserved.(A Unit of Seminator Infosystem PVT. LTD.)</a>
-
-                                    
-
-                                    <!--<h1  class="title" href="{{route('higher_professional')}}"  style="color:#fff"> Search Job | IT jobs | IT Company Vacancy | Jobs vacancy | Hire employee | Hire IT employee | Hire Freelancer |Remote Jobs | Hiring Near Me |Freelance Jobs | Find A Job Online Jobs From Home | Job Openings near me | Job opportunities | Mern developer Jobs | Mean Developer jobs | Flutter Developer jobs | .Net Developer jobs | Laravel developer jobs | Job Vacancy ear me | Job websites | Experience jobs | Fresher Jobs | Job sites | IT recruitment</a>-->
-
-                                </div>
-
-                                <div class="col-sm-6 links">
-
-                                    <ul>
-
-                                        <?php 
-
-                                        foreach ($web_details as $w) { ?>
-
-                                            <li><a href="<?php echo $w->fb; ?>" target="_blank"><i class="fa fa-facebook"></i></a></li>
-
-                                            <li><a href="<?php echo $w->insta; ?>" target="_blank"><i class="fa fa-instagram"></i></a></li>
-
-                                            <li><a href="<?php echo $w->linkedin; ?>" target="_blank"><i class="fa fa-linkedin"></i></a></li>
-
-                                            <li><a href="<?php echo $w->twitter; ?>" target="_blank"><i class="fa fa-twitter"></i></a></li>
-
-                                        <?php } ?> 
-
-                                    </ul>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+        <footer class="modern-footer">
+    <div class="footer-container">
+        <!-- Main Footer Content -->
+        <div class="footer-main">
+            <div class="footer-grid">
+                <!-- Categories Section -->
+                <div class="footer-section">
+                    <h3 class="section-title">Browse Categories</h3>
+                    <ul class="footer-links">
+                        <?php $i=1; foreach($category as $m) { 
+                            $url = route('product',['id'=>''.$m->id.'']); 
+                            if ($i++ > 5) break;
+                        ?>
+                        <li>
+                            <a href="<?php echo $url; ?>" class="footer-link">
+                                <i class="fa fa-chevron-right"></i> <?php echo $m->name; ?>
+                            </a>
+                        </li>
+                        <?php } ?>
+                    </ul>
                 </div>
 
+                <!-- Quick Links Section -->
+                <div class="footer-section">
+                    <h3 class="section-title">Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{route('aboutus')}}" class="footer-link"><i class="fa fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="{{route('contact')}}" class="footer-link"><i class="fa fa-chevron-right"></i> Contact</a></li>
+                        <li><a href="{{route('faq')}}" class="footer-link"><i class="fa fa-chevron-right"></i> FAQs</a></li>
+                        <li><a href="{{route('blogs')}}" class="footer-link"><i class="fa fa-chevron-right"></i> Blog</a></li>
+                        <li><a href="{{route('commercial_license')}}" class="footer-link"><i class="fa fa-chevron-right"></i> License</a></li>
+                        <li><a href="{{route('developer_registration')}}" target="_blank" class="footer-link"><i class="fa fa-chevron-right"></i> Become a Pro</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal Section -->
+                <div class="footer-section">
+                    <h3 class="section-title">Legal</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{route('refund_policy')}}" class="footer-link"><i class="fa fa-chevron-right"></i> Refund Policy</a></li>
+                        <li><a href="{{route('privacy')}}" class="footer-link"><i class="fa fa-chevron-right"></i> Privacy Policy</a></li>
+                        <li><a href="{{route('term')}}" class="footer-link"><i class="fa fa-chevron-right"></i> Terms & Conditions</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter Section -->
+                <div class="footer-section newsletter-section">
+                    <h3 class="section-title">Newsletter</h3>
+                    <p class="newsletter-desc">Subscribe to get updates on new products and offers</p>
+                    
+                    @if(Session::has('storeerrmsg'))
+                    <div class="alert alert-{{Session::get('message')}} alert-dismissible fade show">
+                        <small>{{Session::get('storeerrmsg')}}</small>
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    {{Session::forget('message')}}
+                    {{Session::forget('storeerrmsg')}}
+                    @endif
+
+                    <form class="newsletter-form" method="post" action="{{route('store')}}">
+                        @csrf
+                        <div class="input-group">
+                            <input type="email" name="email" placeholder="Your email address" required>
+                            <button type="submit" class="subscribe-btn">
+                                <i class="fa fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="popular-tags">
+                        <h4>Popular Searches:</h4>
+                        <div class="tags">
+                            <a href="{{route('higher_professional')}}" class="tag">IT Jobs</a>
+                            <a href="{{route('higher_professional')}}" class="tag">Remote Work</a>
+                            <a href="{{route('higher_professional')}}" class="tag">Freelance</a>
+                            <a href="{{route('higher_professional')}}" class="tag">MERN Stack</a>
+                            <a href="{{route('higher_professional')}}" class="tag">Laravel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="footer-brand">
+             
+                <div class="security-badge">
+                    <a href="#" onclick="window.open('https://www.sitelock.com/verify.php?site=mellowelements.in','SiteLock','width=600,height=600,left=160,top=170');">
+                        <img src="{{url('public/upload/header/1628667601.png')}}" alt="SiteLock" class="brand-logo">
+                    </a>
+                </div>
             </div>
 
+            <div class="footer-copyright">
+                <p>&copy; 2021 Mellow Elements. A Unit of Seminator Infosystem PVT. LTD.</p>
+            </div>
 
+            <div class="footer-social">
+                <?php foreach ($web_details as $w) { ?>
+                    <a href="<?php echo $w->fb; ?>" class="social-icon" target="_blank"><i class="fa fa-facebook"></i></a>
+                    <a href="<?php echo $w->insta; ?>" class="social-icon" target="_blank"><i class="fa fa-instagram"></i></a>
+                    <a href="<?php echo $w->linkedin; ?>" class="social-icon" target="_blank"><i class="fa fa-linkedin"></i></a>
+                    <a href="<?php echo $w->twitter; ?>" class="social-icon" target="_blank"><i class="fa fa-twitter"></i></a>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</footer>
 
-           
+<style>
+/* Modern Footer Styles */
+.modern-footer {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #e6e6e6;
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+    overflow: hidden;
+    padding-top: 60px;
+}
 
-            <!--<div class="fabs">
+.modern-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #3498db, #9b59b6, #e67e22);
+    background-size: 200% 100%;
+    animation: gradient 3s ease infinite;
+}
 
-                <div class="chat">
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 
-                    <div class="chat_header">
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
 
-                        <div class="chat_option">
+.footer-main {
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
 
-                            <div class="header_img">
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 40px;
+}
 
-                                <img src="http://res.cloudinary.com/dqvwa7vpe/image/upload/v1496415051/avatar_ma6vug.jpg"/>
+.footer-section {
+    margin-bottom: 30px;
+}
 
-                            </div>
+.section-title {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
 
-                            <span id="chat_head">Chat With Admin</span>
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 40px;
+    height: 3px;
+    background: #3498db;
+}
 
-                            <span id="chat_fullscreen_loader" class="chat_fullscreen_loader"><i class="fullscreen zmdi zmdi-window-maximize"></i></span>
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
-                        </div>
+.footer-links li {
+    margin-bottom: 12px;
+}
 
-                    </div>
+.footer-link {
+    color: #b8b8b8;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
 
-                    <div class="chat_body chat_login chat_conversion chat_converse">
+.footer-link i {
+    margin-right: 8px;
+    font-size: 12px;
+    color: #3498db;
+    transition: all 0.3s ease;
+}
 
-                        
+.footer-link:hover {
+    color: #fff;
+    transform: translateX(5px);
+}
 
-                        <span class="chat_msg_item chat_msg_item_admin">
+.footer-link:hover i {
+    color: #e67e22;
+}
 
-                            
+/* Newsletter Section */
+.newsletter-section {
+    position: relative;
+}
 
-                            Hey there! Any question?
+.newsletter-desc {
+    color: #aaa;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+}
 
-                            
+.newsletter-form {
+    position: relative;
+    margin-bottom: 30px;
+}
 
-                        </span>
+.newsletter-form input {
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
 
-                    </div>
+.newsletter-form input:focus {
+    outline: none;
+    background: rgba(255,255,255,0.15);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+}
 
+.newsletter-form input::placeholder {
+    color: #aaa;
+}
 
+.subscribe-btn {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 7px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
 
-                    
+.subscribe-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
 
-                    <div class="fab_field">
+/* Popular Tags */
+.popular-tags h4 {
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
 
-                        <a id="fab_send" class="fab send-msg"><i class="fa fa-send chat_messages"></i></a>
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
 
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}" >
+.tag {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+}
 
-                        <textarea id="message" name="message" placeholder="Send a message" class="chat_field chat_message"></textarea>
+.tag:hover {
+    background: #3498db;
+    color: #fff;
+    transform: translateY(-2px);
+}
 
-                    </div>
+/* Footer Bottom */
+.footer-bottom {
+    
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
 
-                </div>
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
 
-                <a id="prime" class="fab"><i class="prime fa fa-comment"></i></a>
+.brand-logo {
+    max-height: 40px;
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
 
-            </div>-->
+.brand-logo:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
 
-            
+.security-badge img {
+    height: 30px;
+}
 
-            
+.footer-copyright {
+    color: #aaa;
+    font-size: 14px;
+    margin: 15px 0;
+}
 
-        </footer>
+.footer-social {
+    display: flex;
+    gap: 15px;
+    padding: 0px !important;
+}
 
+.social-icon {
+    color: #aaa;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.05);
+    transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+    color: #fff;
+    background: #3498db;
+    transform: translateY(-3px) scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .footer-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .footer-brand {
+        justify-content: center;
+    }
+    
+    .footer-social {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .section-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .footer-link:hover {
+        transform: none;
+    }
+}
+</style>
         
 
         
@@ -2165,7 +2275,7 @@ hideChat(0);
 
 $('#prime').click(function() {
 
-  toggleFab();
+  togglefa();
 
 });
 
@@ -2175,7 +2285,7 @@ $('#prime').click(function() {
 
 //Toggle chat and links
 
-function toggleFab() {
+function togglefa() {
 
   $('.prime').toggleClass('zmdi-comment-outline');
 
@@ -2189,7 +2299,7 @@ function toggleFab() {
 
   $('.chat').toggleClass('is-visible');
 
-  $('.fab').toggleClass('is-visible');
+  $('.fa').toggleClass('is-visible');
 
   
 
@@ -2223,7 +2333,7 @@ function toggleFab() {
 
       $('.chat').toggleClass('chat_fullscreen');
 
-      $('.fab').toggleClass('is-hide');
+      $('.fa').toggleClass('is-hide');
 
       $('.header_img').toggleClass('change_img');
 
@@ -2231,7 +2341,7 @@ function toggleFab() {
 
       $('.chat_header').toggleClass('chat_header2');
 
-      $('.fab_field').toggleClass('fab_field2');
+      $('.fa_field').toggleClass('fa_field2');
 
       $('.chat_converse').toggleClass('chat_converse2');
 
