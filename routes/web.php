@@ -360,6 +360,8 @@ Route::post('premium-points-update','App\Http\Controllers\admincontroller@premiu
 Route::post('premium-points-delete','App\Http\Controllers\admincontroller@premiumPointsDelete')->name('premium_points_delete');
 
 Route::post('premium-price-store','App\Http\Controllers\admincontroller@premiumPriceStore')->name('premium_price_store');
+Route::post('send-email-notification','App\Http\Controllers\admincontroller@sendEmail')->name('send.email.notification');
+
 
 /*
 ---------------------------------------------------------------------------------------------------------

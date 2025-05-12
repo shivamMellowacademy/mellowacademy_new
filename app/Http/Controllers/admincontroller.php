@@ -1805,6 +1805,34 @@ public function update_developer_details(Request $request)
         $email= Session::get('admin_login_role');
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
         $devLogin = DB::table('developer_details_tb')->where('dev_id',$dev_id)->first();
+
+        if (!$devLogin) {
+            session(['message' => 'danger', 'errmsg' => 'Developer not found.']);
+            return redirect()->back();
+        }
+    
+        // Check if trying to activate and profile is incomplete
+        if ($devLogin->login_status == 0 && $devLogin->profile_complete < 100) {
+            $emails = [$devLogin->email];
+            $datas = [
+                'email' => $devLogin->email,
+                'show_password' => $devLogin->show_password,
+                'name' => $devLogin->name
+            ];
+    
+            // Send incomplete profile email
+            $messageBody = "Dear {$devLogin->name},\n\nYour profile is incomplete. Please complete your profile including KYC, bank details, and other required information to activate your account.\n\nThank you,\nMellow Voult";
+
+            Mail::raw($messageBody, function ($message) use ($devLogin) {
+                $message->to($devLogin->email)
+                        ->subject('Complete Your Profile – Mellow Voult')
+                        ->from('dev@mellowelements.in', 'Mellow Voult');
+            });
+    
+            session(['message' => 'warning', 'errmsg' => 'Cannot activate developer. Profile is incomplete. Email sent to user.']);
+            return redirect()->back();
+        }
+
         $Login_status = $devLogin->login_status;
         
         // call new panels api for saving active developer
@@ -3276,6 +3304,23 @@ public function update_developer_details(Request $request)
             return redirect()->back()->with('success', 'Premium Price updated successfully.');
     
     
+        }
+
+        public function sendEmail(Request $request)
+        {
+            $request->validate([
+                'email' => 'required|email',
+                'subject' => 'required|string|max:255',
+                'message' => 'required|string',
+            ]);
+        
+            Mail::raw($request->message, function ($message) use ($request) {
+                $message->to($request->email)
+                        ->subject($request->subject);
+            });
+        
+            session(['message' => 'success', 'errmsg' => 'Email sent successfully!.']);
+            return redirect()->back();
         }
     
 }

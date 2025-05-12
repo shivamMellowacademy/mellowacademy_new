@@ -87,6 +87,10 @@
                                                         data-toggle="modal"
                                                         data-target="#myprojectModal<?php echo $s->dev_id; ?>"><i
                                                             class="fa fa-show"></i> View Project Details</a>
+                                                    <a class="dropdown-item" href="javascript:void();"
+                                                        data-toggle="modal"
+                                                        data-target="#emailModal<?php echo $s->dev_id; ?>"><i
+                                                            class="fa fa-show"></i> Email notification</a>
                                                     <!-- Create Action Button -->
                                                     <!-- <a class="dropdown-item" href="<?php echo url('developer_create_action', ['dev_id' => $s->dev_id]); ?>"><i class="fa fa-plus"></i> Create Action</a> -->
                                                 </div>
@@ -327,6 +331,69 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <!-- mail modal -->
+                                    <div class="modal fade" id="emailModal<?php echo $s->dev_id; ?>" tabindex="-1"
+                                        role="dialog" aria-labelledby="projectModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg" role="document">
+                                            <div class="modal-content">
+                                                <form action="{{ route('send.email.notification') }}" method="POST">
+                                                    @csrf
+                                                    <div class="modal-header bg-primary text-white">
+                                                        <h5 class="modal-title text-white" id="projectModalLabel">Email
+                                                            to {{ $s->name }}</h5>
+                                                        <button type="button" class="close text-white"
+                                                            data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+                                                        <!-- Hidden Inputs -->
+                                                        <input type="hidden" name="dev_id" value="{{ $s->dev_id }}">
+                                                        <input type="hidden" name="email" value="{{ $s->email }}">
+
+                                                        <!-- Subject Input -->
+                                                        <div class="form-group">
+                                                            <label for="subject">Subject <span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control rounded-0"
+                                                                name="subject" id="subject"
+                                                                value="Please Complete Your Profile – KYC, Bank Details & More"
+                                                                required>
+                                                        </div>
+
+                                                        <!-- Message Input -->
+                                                        <div class="form-group">
+                                                            <label for="message">Message <span
+                                                                    class="text-danger">*</span></label>
+                                                            <textarea class="form-control rounded-0" name="message"
+                                                                id="message" rows="6" required>
+Dear {{ $s->name }},
+
+We noticed that your profile is incomplete. To proceed smoothly with our onboarding and compliance process, please update the following details:
+- Personal Profile Information
+- KYC (Know Your Customer)
+- Bank Details
+
+Visit your dashboard to complete the profile.
+
+Thanks & Regards,  
+Mellow Voult
+                        </textarea>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-primary">Send
+                                                            Email</button>
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <?php $i++;
                                     } ?>
                                 </tbody>
