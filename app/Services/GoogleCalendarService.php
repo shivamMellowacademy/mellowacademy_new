@@ -15,6 +15,7 @@ class GoogleCalendarService
 
     public function __construct()
     {
+<<<<<<< HEAD
         $this->client = new \Google_Client();
         $this->client->setAuthConfig(storage_path('app/google-calendar-credentials.json'));
         $this->client->addScope(\Google_Service_Calendar::CALENDAR);
@@ -39,6 +40,38 @@ class GoogleCalendarService
             // No token in session
             $this->client = null;
             $this->service = null;
+=======
+        // Initialize the Google_Client instance
+        $this->client = new Google_Client();
+        $this->client->setClientId(env('GOOGLE_CLIENT_ID'));
+        $this->client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
+        $this->client->setRedirectUri(env('GOOGLE_REDIRECT_URI'));
+        $this->client->setAccessType('offline');
+        $this->client->setApprovalPrompt('force');
+        $this->client->setScopes([
+            'https://www.googleapis.com/auth/calendar',
+            'https://www.googleapis.com/auth/calendar.events'
+        ]);
+
+        // Load access token from DB (if exists)
+        $googleToken = GoogleToken::latest()->first();
+        if ($googleToken) {
+            // Set the access token to the Google Client
+            $this->client->setAccessToken([
+                'access_token' => $googleToken->access_token,
+                'refresh_token' => $googleToken->refresh_token,
+                'expires_in' => $googleToken->expires_in,
+                'scope' => $googleToken->scope,
+                'token_type' => $googleToken->token_type,
+            ]);
+
+            // If the access token has expired, refresh it
+            if ($this->client->isAccessTokenExpired()) {
+                $newToken = $this->client->fetchAccessTokenWithRefreshToken($this->client->getRefreshToken());
+                $this->saveAccessToken($newToken);
+                $this->client->setAccessToken($newToken);
+            }
+>>>>>>> 80721d21ce79ec7ebb4074a76c92dda668d8638a
         }
     }
 

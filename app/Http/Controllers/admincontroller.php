@@ -17,6 +17,7 @@ use Mail;
 use App\Models\developerPremiumPrice;
 use App\Models\Premium;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\File;
 
 class admincontroller extends Controller
 {
@@ -130,112 +131,118 @@ class admincontroller extends Controller
     
     public function submit_category(Request $request)
     {   
-       
-        request()->validate(
-        [
+        $request->validate([
             'title' => 'required',
             'name' => 'required',
             'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
-            'multiple_image.*' => 'required|image|mimes:jpg,png,jpeg,gif,|max:5120',
+            'multiple_image.*' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
         ]);
-
-
-        $images=array();
-        $img=array();
-        if($files=$request->file('multiple_image'))
-        {
-            $img=array();
-            foreach($files as $file)
-            {
-                $getimageName=rand(0,999999999).''.$file->getClientOriginalName();              
-                $path = public_path('upload/category/'.$getimageName);
-                Image::make($file)->save($path);   
-                $img[]=$getimageName;
-            }           
-            $multiple_image=implode(",",$img);          
-        }       
-        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-        $path = public_path('upload/category/'.$getimageName);
-        $img = Image::make($request->file('image')->getRealPath())->save($path);
-
-
-        $data=array(
-            'title'=>$request->post('title'),
-            'name'=>$request->post('name'),
-            'image'=>$getimageName,
-            'multiple_image'=>$multiple_image
-        );
-
-        $result=DB::table('category_tb')->insert($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Category Added Successfully...']);
-            return redirect()->back();
+    
+        $multiple_image = '';
+        if ($request->hasFile('multiple_image')) {
+            $imgNames = [];
+    
+            foreach ($request->file('multiple_image') as $file) {
+                $fileName = rand(0,999999999) . '_' . $file->getClientOriginalName();
+                $file->move(public_path('upload/category/'), $fileName);
+                $imgNames[] = $fileName;
+            }
+    
+            $multiple_image = implode(",", $imgNames);
         }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Category Added Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
+    
+        $singleImage = '';
+        if ($request->hasFile('image')) {
+            $singleImage = time() . '.' . $request->image->getClientOriginalExtension();
+            $request->file('image')->move(public_path('upload/category/'), $singleImage);
         }
+    
+        $data = [
+            'title' => $request->post('title'),
+            'name' => $request->post('name'),
+            'image' => $singleImage,
+            'multiple_image' => $multiple_image,
+        ];
+    
+        $result = DB::table('category_tb')->insert($data);
+    
+        if ($result) {
+            session(['message' => 'Category Added Successfully...']);
+        } else {
+            session(['message' => 'Category Added Failed. Due To Internal Server Error..']);
+        }
+    
+        return redirect()->back();
     }
+
     
     public function update_category(Request $request)
     {
-        
-        request()->validate(
-        [
+        $request->validate([
             'title' => 'required',
             'name' => 'required',
             'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-            'multiple_image.*' => 'image|mimes:jpg,png,jpeg,gif,|max:5120',
-        ]);  
-
-        if(!empty($files=$request->file('multiple_image')))
-        {
-            $img=array();
-            foreach($files as $file)
-            {
-                $getimageName=rand(0,999999999).''.$file->getClientOriginalName();              
-                $path = public_path('upload/category/'.$getimageName);
-                Image::make($file)->save($path);   
-                $img[]=$getimageName;
-            }           
-            $multiple_image=implode(",",$img);          
+            'multiple_image.*' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+        ]);
+    
+        $uploadPath = public_path('upload/category/');
+    
+        // === Handle multiple images ===
+        if ($request->hasFile('multiple_image')) {
+            $imgNames = [];
+            foreach ($request->file('multiple_image') as $file) {
+                $fileName = rand(0, 999999999) . '_' . $file->getClientOriginalName();
+                $file->move($uploadPath, $fileName);
+                $imgNames[] = $fileName;
+            }
+            $multiple_image = implode(",", $imgNames);
+    
+            // Delete old multiple images AFTER new ones are uploaded
+            $oldMultiple = explode(',', $request->post('old_multiple_image'));
+            foreach ($oldMultiple as $oldFile) {
+                if ($oldFile && File::exists($uploadPath . $oldFile)) {
+                    File::delete($uploadPath . $oldFile);
+                }
+            }
+        } else {
+            $multiple_image = $request->post('old_multiple_image');
         }
-        else
-        {
-            $multiple_image=$request->post('old_multiple_image');
+    
+        // === Handle single image ===
+        if ($request->hasFile('image')) {
+            $singleImage = time() . '.' . $request->image->getClientOriginalExtension();
+            $request->file('image')->move($uploadPath, $singleImage);
+    
+            // Delete old image AFTER new one is uploaded
+            $oldImage = $request->post('old_image');
+            if ($oldImage && File::exists($uploadPath . $oldImage)) {
+                File::delete($uploadPath . $oldImage);
+            }
+        } else {
+            $singleImage = $request->post('old_image');
         }
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/category/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
+    
+        // === Update data ===
+        $data = [
+            'title' => $request->post('title'),
+            'name' => $request->post('name'),
+            'image' => $singleImage,
+            'multiple_image' => $multiple_image,
+        ];
+    
+        $id = $request->post('id');
+        $result = DB::table('category_tb')->where('id', $id)->update($data);
+    
+        if ($result) {
+            session(['message' => 'Category Details Updated Successfully...']);
+        } else {
+            session(['message' => 'Category Details Update Failed. Due To Internal Server Error..']);
         }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
-        
-        $data=array(
-            'title'=>$request->post('title'),
-            'name'=>$request->post('name'), 
-            'image'=>$getimageName,
-            'multiple_image'=>$multiple_image           
-        );
-        $id=$request->post('update');       
-        $result=DB::table('category_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Category Details Update Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Category Details Update   Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
-        }
+    
+        return redirect()->back();
     }
+
+
     
     public function delete_category($id)
     {
@@ -258,87 +265,110 @@ class admincontroller extends Controller
         $email= Session::get('admin_login_role');
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
         $data['category'] = DB::table('category_tb')->orderby('id','desc')->get();
-        $data['subcategory'] = DB::table('subcategory_tb')->orderby('id','desc')->get();
+        $data['subcategory'] = DB::table('subcategory_tb')->orderby('id','desc')->paginate(10);
         return view('admin/subcategory')->with($data);
     }
+
+    // Filter subcategories
+    public function searchSubcategory(Request $request)
+    {
+        $search = $request->get('search');
+        $subcategory = DB::table('subcategory_tb')
+                         ->where('heading', 'like', "%$search%")
+                         ->orWhere('name', 'like', "%$search%")
+                         ->orderby('id', 'desc')
+                         ->paginate(10);
+        return view('admin.subcategory_table_rows', compact('subcategory'))->render();
+    }
+    
     
     public function submit_subcategory(Request $request)
-    {   
-       
-        request()->validate(
-        [
-            'category_id' => 'required',
-            'heading' => 'required',
-            'name' => 'required',
-            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
-        ]);
-        $images=array();
-        $img=array();
-             
-        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-        $path = public_path('upload/subcategory/'.$getimageName);
-        $img = Image::make($request->file('image')->getRealPath())->save($path);
-            
-        $data=array(
-            'category_id'=>$request->post('category_id'),
-            'heading'=>$request->post('heading'),
-            'name'=>$request->post('name'),
-            'image'=>$getimageName
-        );
+{   
+    // Validate the input
+    $request->validate(
+    [
+        'category_id' => 'required',
+        'heading' => 'required',
+        'name' => 'required',
+        'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+    ]);
 
-        $result=DB::table('subcategory_tb')->insert($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Sub Category Added Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Sub Category Added Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
-        }
+    // Get the original file name and create a unique name for it
+    $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+
+    // Define the path where the image will be stored
+    $path = public_path('upload/subcategory/'.$getimageName);
+
+    // Move the uploaded file to the specified path
+    $request->file('image')->move(public_path('upload/subcategory'), $getimageName);
+
+    // Prepare data to insert into the database
+    $data = [
+        'category_id' => $request->post('category_id'),
+        'heading' => $request->post('heading'),
+        'name' => $request->post('name'),
+        'image' => $getimageName
+    ];
+
+    // Insert the data into the database
+    $result = DB::table('subcategory_tb')->insert($data);
+
+    // Return response based on the result
+    if ($result) {
+        session(['message' => 'Sub Category Added Successfully...']);
+        return redirect()->back();
+    } else {
+        session(['message' => 'Sub Category Addition Failed. Due To Internal Server Error..']);
+        return redirect()->back();
     }
+}
+
     
-    public function update_subcategory(Request $request)
-    {    
-        
-        request()->validate(
-        [
-            'category_id' => 'required',
-            'heading' => 'required',
-            'name' => 'required',
-            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-        ]);  
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/subcategory/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
+public function update_subcategory(Request $request)
+{    
+    // Validate the input
+    $request->validate(
+    [
+        'category_id' => 'required',
+        'heading' => 'required',
+        'name' => 'required',
+        'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+    ]);  
 
-        $data=array(
-            'category_id'=>$request->post('category_id'),
-            'heading'=>$request->post('heading'),
-            'name'=>$request->post('name'),
-            'image'=>$getimageName            
-        );
-        $id=$request->post('update');       
-        $result=DB::table('subcategory_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Sub Category Details Update Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Sub Category Details Update   Failed. Due To Internal Server Error..']); 
-            return redirect()->back();
-        }
+    // If a new image is uploaded, process it
+    if ($request->hasFile('image')) {
+        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
+        // Define the path to save the new image
+        $path = public_path('upload/subcategory/'.$getimageName);
+        // Move the uploaded file to the specified path
+        $request->file('image')->move(public_path('upload/subcategory'), $getimageName);
+    } else {
+        // If no new image is uploaded, keep the old image
+        $getimageName = $request->post('old_image');
     }
+
+    // Prepare the updated data for the subcategory
+    $data = [
+        'category_id' => $request->post('category_id'),
+        'heading' => $request->post('heading'),
+        'name' => $request->post('name'),
+        'image' => $getimageName            
+    ];
+
+    // Update the subcategory data in the database
+    $id = $request->post('update');
+    $result = DB::table('subcategory_tb')->where('id', $id)->update($data);
+
+    // Return response based on the result
+    if ($result) {
+        session(['message' => 'Sub Category Details Updated Successfully...']);
+        return redirect()->back();
+    } else {
+        session(['message' => 'Sub Category Update Failed Due to Internal Server Error..']);
+        return redirect()->back();
+    }
+}
+
     
     public function delete_subcategory($id)
     {
@@ -346,12 +376,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('subcategory_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Sub Category Details Delete Successfully. ']); 
+            session(['message' =>'Sub Category Details Delete Successfully. ']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Sub Category Details Delete Failed ? Due To Internal Server Error...']); 
+            session(['message' =>'Sub Category Details Delete Failed ? Due To Internal Server Error...']); 
             return redirect()->back();
         }
     }  
@@ -1132,12 +1162,12 @@ class admincontroller extends Controller
         $result=DB::table('privacy_policy_tb')->insert($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Privacy Policy Added Successfully...']);
+            session(['message' =>'Privacy Policy Added Successfully...', 'errmsg' =>'']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Privacy Policy Added Failed.']); 
+            session(['message' =>'Privacy Policy Added Failed.']); 
             return redirect()->back();
         }
     }
@@ -1160,12 +1190,12 @@ class admincontroller extends Controller
         $result=DB::table('privacy_policy_tb')->where('id',$id)->update($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Privacy Policy Update Successfully...']);
+            session(['message' =>'Privacy Policy Update Successfully...', 'errmsg' =>'']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Privacy Policy Update Failed.']); 
+            session(['message' =>'Privacy Policy Update Failed.']); 
             return redirect()->back();
         }
     }
@@ -1176,12 +1206,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('privacy_policy_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Privacy Policy Delete Successfully. ']); 
+            session(['message' =>'Privacy Policy Delete Successfully. ']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Privacy Policy Delete Failed']); 
+            session(['message' =>'Privacy Policy Delete Failed']); 
             return redirect()->back();
         }
     }  
@@ -1190,7 +1220,7 @@ class admincontroller extends Controller
     {
         $email= Session::get('admin_login_role');
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
-        $data['term_condition'] = DB::table('term_tb')->orderby('id','asc')->get();
+        $data['term_condition'] = DB::table('term_tb')->orderby('id','desc')->get();
         return view('admin/term_condition')->with($data);
     }
     
@@ -1212,19 +1242,17 @@ class admincontroller extends Controller
         $result=DB::table('term_tb')->insert($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Term Condition Added Successfully...']);
+            session(['message' =>'Term Condition Added Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Term Condition Added Failed.']); 
+            session(['message' =>'Term Condition Added Failed.']); 
             return redirect()->back();
         }
     }
     
-    public function update_term_condition(Request $request)
-    {
-        
+    public function update_term_condition(Request $request){
         request()->validate(
         [
             'heading' => 'required',
@@ -1240,28 +1268,27 @@ class admincontroller extends Controller
         $result=DB::table('term_tb')->where('id',$id)->update($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Term Condition Update Successfully...']);
+            session(['message' =>'Term Condition Update Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Term Condition Update Failed.']); 
+            session(['message' =>'Term Condition Update Failed.']); 
             return redirect()->back();
         }
     }
     
     public function delete_term_condition($id)
     {
-        
         $info_delete=DB::table('term_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Term Condition Delete Successfully. ']); 
+            session(['message' =>'Term Condition Delete Successfully. ']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Term Condition Delete Failed ? Due To Internal Server Error...']); 
+            session(['message' =>'Term Condition Delete Failed ? Due To Internal Server Error...']); 
             return redirect()->back();
         }
     } 
@@ -1358,74 +1385,78 @@ class admincontroller extends Controller
     }
     
     public function submit_hig_prof(Request $request)
-    {   
-        
-        request()->validate(
-        [
-            'heading' => 'required',
+    {
+        $request->validate([
+            'heading' => 'required|string|max:255',
             'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
         ]);
-
-        $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-        $path = public_path('upload/hig_prof/'.$getimageName);
-        $img = Image::make($request->file('image')->getRealPath())->save($path);
-            
-
-        $data=array(
-            'heading'=>$request->post('heading'),
-            'image'=>$getimageName,
-        );
-
-        $result=DB::table('higher_professional_tb')->insert($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Higher Professional Added Successfully...']);
-            return redirect()->back();
+    
+        // Handle image upload without Intervention Image
+        $imageName = time() . '.' . $request->image->getClientOriginalExtension();
+        $request->image->move(public_path('upload/hig_prof'), $imageName);
+    
+        // Prepare data for insertion
+        $data = [
+            'heading' => $request->input('heading'),
+            'image' => $imageName,
+        ];
+    
+        $inserted = DB::table('higher_professional_tb')->insert($data);
+    
+        if ($inserted) {
+            session()->flash('message', 'Higher Professional Added Successfully...');
+        } else {
+            session()->flash('message', 'Higher Professional Add Failed.');
         }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Higher Professional Added Failed.']); 
-            return redirect()->back();
-        }
+    
+        return redirect()->back();
     }
     
+    
     public function update_hig_prof(Request $request)
-    {
-        
-        request()->validate(
-        [
-            'heading' => 'required',
-            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-        ]);  
+{
+    $request->validate([
+        'heading' => 'required|string|max:255',
+        'image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:5120',
+    ]);
 
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/hig_prof/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
+    $id = $request->post('update');
+    $oldImage = $request->post('old_image');
 
-        $data=array(
-            'heading'=>$request->post('heading'),
-            'image'=>$getimageName,
-        );
-        $id=$request->post('update');       
-        $result=DB::table('higher_professional_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Higher Professional Details Update Successfully...']);
-            return redirect()->back();
+    if ($request->hasFile('image')) {
+        // Generate new image name
+        $newImageName = time() . '.' . $request->image->getClientOriginalExtension();
+
+        // Move new image to destination
+        $request->image->move(public_path('upload/hig_prof'), $newImageName);
+
+        // Remove old image file from folder (if exists)
+        $oldImagePath = public_path('upload/hig_prof/' . $oldImage);
+        if (file_exists($oldImagePath) && !empty($oldImage)) {
+            @unlink($oldImagePath);
         }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Higher Professional Details Update Failed.']); 
-            return redirect()->back();
-        }
+    } else {
+        // Use old image if new one is not uploaded
+        $newImageName = $oldImage;
     }
+
+    // Prepare update data
+    $data = [
+        'heading' => $request->input('heading'),
+        'image' => $newImageName,
+    ];
+
+    $result = DB::table('higher_professional_tb')->where('id', $id)->update($data);
+
+    if ($result) {
+        session(['message' => 'Higher Professional Details Updated Successfully...']);
+    } else {
+        session(['message' => 'Higher Professional Details Update Failed.']);
+    }
+
+    return redirect()->back();
+}
+
     
     public function delete_hig_prof($id)
     {
@@ -1433,12 +1464,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('higher_professional_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Higher Professional Details Delete Successfully. ']); 
+            session(['message' =>'Higher Professional Details Delete Successfully.']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Higher Professional Details Delete Failed.']); 
+            session(['message' =>'Higher Professional Details Delete Failed.']); 
             return redirect()->back();
         }
     }  
@@ -1499,144 +1530,122 @@ class admincontroller extends Controller
 
     
     public function submit_developer_details(Request $request)
-    {   
-        $email=$request->post('email');
-        
-        $count = DB::table('developer_details_tb')->where('email',$email)->count();
-        
-        if($count == 0)
-        {
-            request()->validate(
-            [
-                'pro_id' => 'required',
-                'name' => 'required',
-                'last_name' => 'required',
-                'phone' => 'required',
-                'email' => 'required',
-                'password' => 'required',
-                'description' => 'required',
-                'job' => 'required',
-                'total_hours' => 'required',
-                'perhr' => 'required',
-                'rating' => 'required',
-                'address' => 'required',
-                'language' => 'required',
-                'education' => 'required',
-                'clg_name' => 'required',
-                'degree' => 'required',
-                'percentage' => 'required',
-                'passing_year' => 'required',
-                'skills' => 'required',
-                'completed_job' => 'required',
-                'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
-                'portfolio_image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
-                'resume' => ['required', 'mimes:pdf','max:1000mb']
-            ]);
+{   
+    $email = $request->post('email');
+    
+    $count = DB::table('developer_details_tb')->where('email', $email)->count();
+    
+    if ($count == 0) {
+        request()->validate([
+            'pro_id' => 'required',
+            'name' => 'required',
+            'last_name' => 'required',
+            'phone' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
+            'description' => 'required',
+            'job' => 'required',
+            'total_hours' => 'required',
+            'perhr' => 'required',
+            'rating' => 'required',
+            'address' => 'required',
+            'language' => 'required',
+            'education' => 'required',
+            'clg_name' => 'required',
+            'degree' => 'required',
+            'percentage' => 'required',
+            'passing_year' => 'required',
+            'skills' => 'required',
+            'completed_job' => 'required',
+            'image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'portfolio_image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
+            'resume' => ['required', 'mimes:pdf', 'max:1024000'] // max 1000MB in KB
+        ]);
 
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/developer/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
+        // Upload profile image
+        $getimageName = time() . '_profile.' . $request->image->getClientOriginalExtension();       
+        $request->image->move(public_path('upload/developer'), $getimageName);
 
+        // Upload portfolio image
+        $getportfolioimage = time() . '_portfolio.' . $request->portfolio_image->getClientOriginalExtension();       
+        $request->portfolio_image->move(public_path('upload/portfolio'), $getportfolioimage);  
 
-            $getportfolioimage = time().'.'.$request->portfolio_image->getClientOriginalExtension();       
-            $path = public_path('upload/portfolio/'.$getportfolioimage);
-            $img = Image::make($request->file('portfolio_image')->getRealPath())->save($path);  
+        // Upload resume
+        $getresume = null;
+        if ($request->hasFile('resume')) {
+            $new_name = rand() . '.' . $request->resume->getClientOriginalExtension();
+            $request->resume->move(public_path('upload/resume'), $new_name); 
+            $getresume = 'upload/resume/' . $new_name;
+        }
 
-            if($files=$request->file('resume'))
-            {
-                $new_name = rand().'.'.$request->resume->getClientOriginalExtension();
-                $getresume = $request->resume->move(public_path('upload/resume'),$new_name); 
-            }
+        // Implode education fields
+        $education = implode(',', $request->post('education'));
+        $clg_name = implode(',', $request->post('clg_name'));
+        $degree = implode(',', $request->post('degree'));
+        $percentage = implode(',', $request->post('percentage'));
+        $passing_year = implode(',', $request->post('passing_year'));
 
-            $array_education = $request->post('education');
-            $education = implode(',', $array_education);
+        $data = [
+            'pro_id' => $request->post('pro_id'),
+            'name' => $request->post('name'),
+            'last_name' => $request->post('last_name'),
+            'phone' => $request->post('phone'),
+            'email' => $request->post('email'),
+            'password' => md5($request->post('password')),
+            'show_password' => $request->post('password'),
+            'description' => $request->post('description'),
+            'job' => $request->post('job'),
+            'total_hours' => $request->post('total_hours'),
+            'perhr' => $request->post('perhr'),
+            'rating' => $request->post('rating'),
+            'address' => $request->post('address'),
+            'language' => $request->post('language'),
+            'education' => $education,
+            'clg_name' => $clg_name,
+            'degree' => $degree,
+            'percentage' => $percentage,
+            'passing_year' => $passing_year,
+            'skills' => $request->post('skills'),
+            'completed_job' => $request->post('completed_job'),
+            'image' => $getimageName,
+            'portfolio_image' => $getportfolioimage,
+            'resume' => $getresume,
+            'profile_complete' => 100,
+            'login_status' => 1,
+            'date' => date('y/m/d')
+        ];
 
-            $array_clg_name = $request->post('clg_name');
-            $clg_name = implode(',', $array_clg_name);
+        $result = DB::table('developer_details_tb')->insert($data);
 
-            $array_degree = $request->post('degree');
-            $degree = implode(',', $array_degree);
+        if ($result) {
+            $details = DB::table('developer_details_tb')->where('email', $email)->first();
 
-            $array_percentage = $request->post('percentage');
-            $percentage = implode(',', $array_percentage);
+            $emails = [$details->email];
+            $datas = [
+                'name' => $details->name,
+                'email' => $details->email,
+                'show_password' => $details->show_password,
+                'link' => route('developer_admin')
+            ];
 
-            $array_passing_year = $request->post('passing_year');
-            $passing_year = implode(',', $array_passing_year);
-            
+            session(['message' => 'Developer Details Added Successfully...']);
 
-            $data=array(
-                'pro_id'=>$request->post('pro_id'),
-                'name'=>$request->post('name'),
-                'last_name'=>$request->post('last_name'),
-                'phone'=>$request->post('phone'),
-                'email'=>$request->post('email'),
-                'password'=>md5($request->post('password')),
-                'show_password'=>$request->post('password'),
-                'description'=>$request->post('description'),
-                'job'=>$request->post('job'),
-                'total_hours'=>$request->post('total_hours'),
-                'perhr'=>$request->post('perhr'),
-                'rating'=>$request->post('rating'),
-                'address'=>$request->post('address'),
-                'language'=>$request->post('language'),
-                'education'=>$education,
-                'clg_name'=>$clg_name,
-                'degree'=>$degree,
-                'percentage'=>$percentage,
-                'passing_year'=>$passing_year,
-                'skills'=>$request->post('skills'),
-                'completed_job'=>$request->post('completed_job'),
-                'image'=>$getimageName,
-                'portfolio_image'=>$getportfolioimage,
-                'resume'=>$getresume,
-                'profile_complete'=>100,
-                'login_status'=>1,
-                'date'=>date('y/m/d')
-            );
+            Mail::send('developer_add_mail', $datas, function ($message) use ($emails) {
+                $message->to($emails)->subject('Mellow Elements');
+                $message->from('dev@mellowelements.in', 'Mellow Elements');
+            });
 
-            $result=DB::table('developer_details_tb')->insert($data);
-
-            $email =  $request->post('email');
-            $details = DB::table('developer_details_tb')->where('email',$email)->get();
-            $emails=array();
-            foreach ($details as $key) 
-            {
-                $emails[]= $key->email;
-                $url = route('developer_admin'); 
-                $name = $key->name;
-                $email = $key->email;
-                $show_password = $key->show_password;
-            }
-
-            $datas=array(
-                'name'=>$name,
-                'email'=>$email,
-                'show_password'=>$show_password,
-                'link'=>$url
-            );
-
-            if($result==true)
-            {
-                session(['message' =>'success', 'errmsg' =>'Developer Details Added Successfully...']);
-                Mail::send('developer_add_mail', $datas, function($message) use ($emails)
-                {
-                    $message->to($emails)->subject('Mellow Elements');
-                    
-                    $message->from('dev@mellowelements.in', 'Mellow Elements');   
-                });
-                return redirect()->route('active_developer_details');
-            }
-            else
-            {
-                session(['message' =>'danger', 'errmsg'=>'Developer Details Added Failed.']); 
-                return redirect()->back();
-            }
-        }else
-            {
-                session(['message' =>'danger', 'errmsg' =>'Email Address Already Exists.']);
-                return redirect()->back();
-            }
+            return redirect()->route('active_developer_details');
+        } else {
+            session(['message' => 'Developer Details Added Failed.']); 
+            return redirect()->back();
+        }
+    } else {
+        session(['message' => 'Email Address Already Exists.']);
+        return redirect('hig_prof');
     }
+}
+
     
     public function developer_details_update($dev_id)
     {  
@@ -1651,100 +1660,98 @@ class admincontroller extends Controller
         return view('admin/developer_details_update')->with($data);
     }
     
-    public function update_developer_details(Request $request)
-    {
-        
-        request()->validate(
-        [
-            'pro_id' => 'required',
-            'name' => 'required',
-            'last_name' => 'required',
-            'phone' => 'required',
-            'email' => 'required',
-            'description' => 'required',
-            'job' => 'required',
-            'total_hours' => 'required',
-            'perhr' => 'required',
-            'rating' => 'required',
-            'address' => 'required',
-            'language' => 'required',
-            
-            'skills' => 'required',
-            'completed_job' => 'required',
-            'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-            'portfolio_image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
-            'resume' => 'mimes:pdf|max:1000mb'
-        ]);  
+    
 
+public function update_developer_details(Request $request)
+{
+    $request->validate([
+        'pro_id' => 'required',
+        'name' => 'required',
+        'last_name' => 'required',
+        'phone' => 'required',
+        'email' => 'required',
+        'description' => 'required',
+        'job' => 'required',
+        'total_hours' => 'required',
+        'perhr' => 'required',
+        'rating' => 'required',
+        'address' => 'required',
+        'language' => 'required',
+        'skills' => 'required',
+        'completed_job' => 'required',
+        'image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:5120',
+        'portfolio_image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:5120',
+        'resume' => 'nullable|mimes:pdf|max:1024000', // 1000MB = 1,000,000KB
+    ]);
 
-        if(!empty($files=$request->file('image')))
-        {
-            $getimageName = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/developer/'.$getimageName);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getimageName=$request->post('old_image');
-        }
+    $dev_id = $request->post('update');
 
-        if(!empty($files=$request->file('portfolio_image')))
-        {
-            $getportfolioimage = time().'.'.$request->portfolio_image->getClientOriginalExtension();       
-            $path = public_path('upload/portfolio/'.$getportfolioimage);
-            $img = Image::make($request->file('portfolio_image')->getRealPath())->save($path);
-        }
-        else
-        {
-            $getportfolioimage=$request->post('old_portfolio_image');
-        }
+    $developer = DB::table('developer_details_tb')->where('dev_id', $dev_id)->first();
 
-        if(!empty($files=$request->file('resume')))
-        {
-            $new_name = rand().'.'.$request->resume->getClientOriginalExtension();
-            $getresume = $request->resume->move(public_path('upload/resume'),$new_name);             
+    // Upload image
+    if ($request->hasFile('image')) {
+        if ($developer->image && File::exists(public_path('upload/developer/' . $developer->image))) {
+            File::delete(public_path('upload/developer/' . $developer->image));
         }
-        else
-        {
-            $getresume=$request->post('old_resume');
-        }
-
-        
-
-        $data=array(
-            'pro_id'=>$request->post('pro_id'),
-            'name'=>$request->post('name'),
-            'last_name'=>$request->post('last_name'),
-            'phone'=>$request->post('phone'),
-            'email'=>$request->post('email'),
-            'description'=>$request->post('description'),
-            'job'=>$request->post('job'),
-            'total_hours'=>$request->post('total_hours'),
-            'perhr'=>$request->post('perhr'),
-            'rating'=>$request->post('rating'),
-            'address'=>$request->post('address'),
-            'language'=>$request->post('language'),
-            
-            'skills'=>$request->post('skills'),
-            'completed_job'=>$request->post('completed_job'),
-            'image'=>$getimageName,
-            'portfolio_image'=>$getportfolioimage,
-            'resume'=>$getresume,
-        );
-
-        $dev_id=$request->post('update');       
-        $result=DB::table('developer_details_tb')->where('dev_id',$dev_id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Developer Details Update Successfully...']);
-           return redirect()->route('active_developer_details');
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Developer Details Update Failed.']); 
-            return redirect()->back();
-        }
+        $imageName = time() . '.' . $request->image->getClientOriginalExtension();
+        $request->image->move(public_path('upload/developer'), $imageName);
+    } else {
+        $imageName = $developer->image;
     }
+
+    // Upload portfolio image
+    if ($request->hasFile('portfolio_image')) {
+        if ($developer->portfolio_image && File::exists(public_path('upload/portfolio/' . $developer->portfolio_image))) {
+            File::delete(public_path('upload/portfolio/' . $developer->portfolio_image));
+        }
+        $portfolioImage = time() . '_p.' . $request->portfolio_image->getClientOriginalExtension();
+        $request->portfolio_image->move(public_path('upload/portfolio'), $portfolioImage);
+    } else {
+        $portfolioImage = $developer->portfolio_image;
+    }
+
+    // Upload resume
+    if ($request->hasFile('resume')) {
+        if ($developer->resume && File::exists(public_path('upload/resume/' . $developer->resume))) {
+            File::delete(public_path('upload/resume/' . $developer->resume));
+        }
+        $resumeName = time() . '.' . $request->resume->getClientOriginalExtension();
+        $request->resume->move(public_path('upload/resume'), $resumeName);
+    } else {
+        $resumeName = $developer->resume;
+    }
+
+    $data = [
+        'pro_id' => $request->post('pro_id'),
+        'name' => $request->post('name'),
+        'last_name' => $request->post('last_name'),
+        'phone' => $request->post('phone'),
+        'email' => $request->post('email'),
+        'description' => $request->post('description'),
+        'job' => $request->post('job'),
+        'total_hours' => $request->post('total_hours'),
+        'perhr' => $request->post('perhr'),
+        'rating' => $request->post('rating'),
+        'address' => $request->post('address'),
+        'language' => $request->post('language'),
+        'skills' => $request->post('skills'),
+        'completed_job' => $request->post('completed_job'),
+        'image' => $imageName,
+        'portfolio_image' => $portfolioImage,
+        'resume' => $resumeName,
+    ];
+
+    $result = DB::table('developer_details_tb')->where('dev_id', $dev_id)->update($data);
+
+    if ($result) {
+        session(['message' => 'Developer Details Updated Successfully...']);
+        return redirect()->route('active_developer_details');
+    } else {
+        session(['message' => 'Developer Details Update Failed.']);
+        return redirect()->back();
+    }
+}
+
     
     public function delete_developer_details($dev_id)
     {
@@ -1798,6 +1805,34 @@ class admincontroller extends Controller
         $email= Session::get('admin_login_role');
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
         $devLogin = DB::table('developer_details_tb')->where('dev_id',$dev_id)->first();
+
+        if (!$devLogin) {
+            session(['message' => 'danger', 'errmsg' => 'Developer not found.']);
+            return redirect()->back();
+        }
+    
+        // Check if trying to activate and profile is incomplete
+        if ($devLogin->login_status == 0 && $devLogin->profile_complete < 100) {
+            $emails = [$devLogin->email];
+            $datas = [
+                'email' => $devLogin->email,
+                'show_password' => $devLogin->show_password,
+                'name' => $devLogin->name
+            ];
+    
+            // Send incomplete profile email
+            $messageBody = "Dear {$devLogin->name},\n\nYour profile is incomplete. Please complete your profile including KYC, bank details, and other required information to activate your account.\n\nThank you,\nMellow Voult";
+
+            Mail::raw($messageBody, function ($message) use ($devLogin) {
+                $message->to($devLogin->email)
+                        ->subject('Complete Your Profile – Mellow Voult')
+                        ->from('dev@mellowelements.in', 'Mellow Voult');
+            });
+    
+            session(['message' => 'warning', 'errmsg' => 'Cannot activate developer. Profile is incomplete. Email sent to user.']);
+            return redirect()->back();
+        }
+
         $Login_status = $devLogin->login_status;
         
         // call new panels api for saving active developer
@@ -1993,78 +2028,66 @@ class admincontroller extends Controller
 
     public function submit_developer_project_details(Request $request)
     {   
-        
-        request()->validate(
-        [
+        $request->validate([
             'developer_id' => 'required',
             'project_link' => 'required',
             'screenshot_image' => 'required|image|mimes:jpg,png,jpeg,gif|max:5120',
         ]);
-
-        $getscreenshotimage = time().'.'.$request->screenshot_image->getClientOriginalExtension();       
-        $path = public_path('upload/screenshot/'.$getscreenshotimage);
-        $img = Image::make($request->file('screenshot_image')->getRealPath())->save($path);
-
-        $data=array(
-
-            'developer_id'=>$request->post('developer_id'),
-            'project_link'=>$request->post('project_link'),
-            'screenshot_image'=>$getscreenshotimage,
-        );
-
-        $result=DB::table('developer_project_details_tb')->insert($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Developer Project Details Added Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Developer Project Details Added Failed.']); 
-            return redirect()->back();
-        }
+    
+        $image = $request->file('screenshot_image');
+        $imageName = time().'.'.$image->getClientOriginalExtension();       
+        $image->move(public_path('upload/screenshot'), $imageName);
+    
+        $data = [
+            'developer_id' => $request->post('developer_id'),
+            'project_link' => $request->post('project_link'),
+            'screenshot_image' => $imageName,
+        ];
+    
+        $result = DB::table('developer_project_details_tb')->insert($data);
+    
+        session(['message' => $result ? 'Developer Project Details Added Successfully...' : 'Developer Project Details Added Failed.']);
+        return redirect()->back();
     }
+    
 
     public function update_developer_project_details(Request $request)
     {
-        
-        request()->validate(
-        [
+        $request->validate([
             'developer_id' => 'required',
             'project_link' => 'required',            
-            'screenshot_image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+            'screenshot_image' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:5120',
         ]);  
-
-        if(!empty($files=$request->file('screenshot_image')))
-        {
-            $getscreenshotimage = time().'.'.$request->screenshot_image->getClientOriginalExtension();       
-            $path = public_path('upload/screenshot/'.$getscreenshotimage);
-            $img = Image::make($request->file('screenshot_image')->getRealPath())->save($path);
+    
+        $id = $request->post('update');
+        $oldImage = $request->post('old_screenshot_image');
+        $imageName = $oldImage;
+    
+        if ($request->hasFile('screenshot_image')) {
+            // Delete old image
+            $oldPath = public_path('upload/screenshot/'.$oldImage);
+            if (file_exists($oldPath) && is_file($oldPath)) {
+                unlink($oldPath);
+            }
+    
+            // Upload new image
+            $image = $request->file('screenshot_image');
+            $imageName = time().'.'.$image->getClientOriginalExtension();       
+            $image->move(public_path('upload/screenshot'), $imageName);
         }
-        else
-        {
-            $getscreenshotimage=$request->post('old_screenshot_image');
-        }
-
-        $data=array(
-            
-            'developer_id'=>$request->post('developer_id'),
-            'project_link'=>$request->post('project_link'),
-            'screenshot_image'=>$getscreenshotimage,
-        );
-       $id=$request->post('update');       
-       $result=DB::table('developer_project_details_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Developer Project Details Update Successfully...']);
-            return redirect()->back();
-        }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Developer Project Details Update Failed.']); 
-            return redirect()->back();
-        }
+    
+        $data = [
+            'developer_id' => $request->post('developer_id'),
+            'project_link' => $request->post('project_link'),
+            'screenshot_image' => $imageName,
+        ];
+    
+        $result = DB::table('developer_project_details_tb')->where('id', $id)->update($data);
+    
+        session(['message' => $result ? 'Developer Project Details Update Successfully...' : 'Developer Project Details Update Failed.']);
+        return redirect()->back();
     }
+    
 
     public function delete_developer_project_details($developer_id)
     {
@@ -2108,12 +2131,12 @@ class admincontroller extends Controller
         $result=DB::table('license_tb')->insert($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'License Added Successfully...']);
+            session(['message' =>'License Saved Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'License Added Failed.']); 
+            session(['message' =>'License Added Failed.']); 
             return redirect()->back();
         }
     }
@@ -2136,28 +2159,27 @@ class admincontroller extends Controller
         $result=DB::table('license_tb')->where('id',$id)->update($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'License Update Successfully...']);
+            session(['message' =>'License Updated Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'License Update Failed.']); 
+            session(['message' =>'License Update Failed.']); 
             return redirect()->back();
         }
     }
     
     public function delete_License($id)
     {
-        
         $info_delete=DB::table('license_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'License Delete Successfully. ']); 
+            session(['message' =>'License Deleted Successfully. ']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'License Delete Failed']); 
+            session(['message' =>'License Delete Failed']); 
             return redirect()->back();
         }
     }  
@@ -2173,108 +2195,96 @@ class admincontroller extends Controller
     
     public function submit_blog(Request $request)
     {
-        request()->validate(
-        [
+        $request->validate([
             'heading' => 'required',
             'description' => 'required',
             'day' => 'required',
             'month' => 'required',
             'year' => 'required',
-            //'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+            // 'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
         ]);  
-        
-        if(!empty($request->file('image')))
-        {
-            $getimageblog = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/blog/'.$getimageblog);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
+    
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $getimageblog = time().'.'.$image->getClientOriginalExtension();       
+            $image->move(public_path('upload/blog/'), $getimageblog);
+        } else {
+            $getimageblog = $request->post('image');
         }
-        else
-        {
-            $getimageblog=$request->post('image');
-        } 
-
-        $data=array(
-            'heading'=>$request->post('heading'),
-            'description'=>$request->post('description'),
-            'day'=>$request->post('day'),
-            'month'=>$request->post('month'),
-            'year'=>$request->post('year'),
-            'image'=>$getimageblog,
-        );           
-        
-        $result=DB::table('blog_tb')->insert($data);
-        //echo $data; exit();
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Blogs Upload Successfully!..']);
-            return redirect()->back();
+    
+        $data = [
+            'heading' => $request->post('heading'),
+            'description' => $request->post('description'),
+            'day' => $request->post('day'),
+            'month' => $request->post('month'),
+            'year' => $request->post('year'),
+            'image' => $getimageblog,
+        ];           
+    
+        $result = DB::table('blog_tb')->insert($data);
+    
+        if ($result) {
+            session(['message' => 'Blogs Upload Successfully!..']);
+        } else {
+            session(['message' => 'Blogs Upload Failed.']);
         }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Blogs Upload Failed.']); 
-            return redirect()->back();
-        }
+    
+        return redirect()->back();
     }
+
     
     public function update_blog(Request $request)
     {
-        
-        request()->validate(
-        [
+        $request->validate([
             'heading' => 'required',
             'description' => 'required',
             'day' => 'required',
             'month' => 'required',
             'year' => 'required',
-            //'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
+            // 'image' => 'image|mimes:jpg,png,jpeg,gif|max:5120',
         ]);
-        
-        if(!empty($request->file('image')))
-        {
-            $getimageblog = time().'.'.$request->image->getClientOriginalExtension();       
-            $path = public_path('upload/blog/'.$getimageblog);
-            $img = Image::make($request->file('image')->getRealPath())->save($path);
+    
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $getimageblog = time().'.'.$image->getClientOriginalExtension();       
+            $image->move(public_path('upload/blog/'), $getimageblog);
+        } else {
+            $getimageblog = $request->post('image');
         }
-        else
-        {
-            $getimageblog=$request->post('image');
-        } 
-
-        $data=array(
-            'heading'=>$request->post('heading'),
-            'description'=>$request->post('description'),
-            'day'=>$request->post('day'),
-            'month'=>$request->post('month'),
-            'year'=>$request->post('year'),
-            'image'=>$getimageblog,
-        );   
-
-        $id=$request->post('update');       
-        $result=DB::table('blog_tb')->where('id',$id)->update($data);
-        if($result==true)
-        {
-            session(['message' =>'success', 'errmsg' =>'Blogs Update Successfully...']);
-            return redirect()->back();
+    
+        $data = [
+            'heading' => $request->post('heading'),
+            'description' => $request->post('description'),
+            'day' => $request->post('day'),
+            'month' => $request->post('month'),
+            'year' => $request->post('year'),
+            'image' => $getimageblog,
+        ];
+    
+        $id = $request->post('update');       
+        $result = DB::table('blog_tb')->where('id', $id)->update($data);
+    
+        if ($result) {
+            session(['message' => 'Blogs Update Successfully...']);
+        } else {
+            session(['message' => 'Blogs Details Update Failed.']);
         }
-        else
-        {
-            session(['message' =>'danger', 'errmsg'=>'Blogs Details Update Failed.']); 
-            return redirect()->back();
-        }
+    
+        return redirect()->back();
     }
+
     
     public function delete_blog($id)
     {
         $info_delete=DB::table('blog_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Blogs Delete Successfully. ']); 
+            session(['message' =>'Blogs Delete Successfully. ']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Blogs Delete Failed ?']); 
+            session(['message' =>'Blogs Delete Failed ?']); 
             return redirect()->back();
         }
     } 
@@ -2305,12 +2315,12 @@ class admincontroller extends Controller
         $result=DB::table('faq_tb')->insert($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'All Questions Upload Successfully...']);
+            session(['message' =>'All Questions Upload Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Questions Details Upload Failed.']); 
+            session(['message' =>'Questions Details Upload Failed.']); 
             return redirect()->back();
         }
     } 
@@ -2332,12 +2342,12 @@ class admincontroller extends Controller
         $result=DB::table('faq_tb')->where('id',$id)->update($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'All Questions Update Successfully...']);
+            session(['message' =>'All Questions Update Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'All Questions Details Update Failed.']); 
+            session(['message' =>'All Questions Details Update Failed.']); 
             return redirect()->back();
         }
     }
@@ -2347,12 +2357,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('faq_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'All Questions Delete Successfully. ']); 
+            session(['message' =>'All Questions Delete Successfully.']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'All Questions Delete Failed ?']); 
+            session(['message' =>'All Questions Delete Failed ?']); 
             return redirect()->back();
         }
     } 
@@ -2617,12 +2627,12 @@ class admincontroller extends Controller
         $result=DB::table('refund_tb')->insert($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Refund Added Successfully...']);
+            session(['message' =>'Refund Added Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Refund Added Failed.']); 
+            session(['message' =>'Refund Added Failed.']); 
             return redirect()->back();
         }
     }
@@ -2645,12 +2655,12 @@ class admincontroller extends Controller
         $result=DB::table('refund_tb')->where('id',$id)->update($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Refund Policy Update Successfully...']);
+            session(['message' =>'Refund Policy Update Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Refund Policy Update Failed.']); 
+            session(['message' =>'Refund Policy Update Failed.']); 
             return redirect()->back();
         }
     }
@@ -2661,12 +2671,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('refund_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Refund Policy Delete Successfully. ']); 
+            session(['message' =>'Refund Policy Delete Successfully.']); 
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Refund Policy Delete Failed']); 
+            session(['message' =>'Refund Policy Delete Failed']); 
             return redirect()->back();
         }
     } 
@@ -3086,7 +3096,7 @@ class admincontroller extends Controller
     {
         $email= Session::get('admin_login_role');
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
-        $data['web_hosting'] = DB::table('web_hosting_tb')->orderby('id','asc')->get();
+        $data['web_hosting'] = DB::table('web_hosting_tb')->orderby('id','desc')->get();
         return view('admin/web_hosting')->with($data);
     }
    
@@ -3110,12 +3120,12 @@ class admincontroller extends Controller
         $result=DB::table('web_hosting_tb')->insert($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Web Hosting Added Successfully...']);
+            session(['message' =>'Web Hosting Added Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Web Hosting Added Failed.']);
+            session(['message' =>'Web Hosting Added Failed.']);
             return redirect()->back();
         }
     }
@@ -3140,12 +3150,12 @@ class admincontroller extends Controller
         $result=DB::table('web_hosting_tb')->where('id',$id)->update($data);
         if($result==true)
         {
-            session(['message' =>'success', 'errmsg' =>'Web Hosting Update Successfully...']);
+            session(['message' =>'Web Hosting Update Successfully...']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Web Hosting Update Failed.']);
+            session(['message' =>'Web Hosting Update Failed.']);
             return redirect()->back();
         }
     }
@@ -3156,12 +3166,12 @@ class admincontroller extends Controller
         $info_delete=DB::table('web_hosting_tb')->where('id', $id)->delete();
         if($info_delete==true)
         {
-            session(['message' =>'success', 'errmsg'=>'Web Hosting Delete Successfully. ']);
+            session(['message' =>'Web Hosting Delete Successfully. ']);
             return redirect()->back();
         }
         else
         {
-            session(['message' =>'danger', 'errmsg'=>'Web Hosting Delete Failed']);
+            session(['message' =>'Web Hosting Delete Failed']);
             return redirect()->back();
         }
     } 
@@ -3242,9 +3252,9 @@ class admincontroller extends Controller
         $data['rolesdetails'] = DB::table('admin_tb')->where('role',$email)->get();
         // $data['web_hosting'] = DB::table('web_hosting_tb')->orderby('id','asc')->get();
 
-        $data['premium'] = Premium::all();
+        $data['premium'] = Premium::orderBy('id', 'desc')->get();
         
-        $data['prices'] = developerPremiumPrice::all();
+        $data['prices'] = developerPremiumPrice::orderBy('id', 'desc')->get();
 
         return view('admin/premium')->with($data);
     }
@@ -3294,6 +3304,23 @@ class admincontroller extends Controller
             return redirect()->back()->with('success', 'Premium Price updated successfully.');
     
     
+        }
+
+        public function sendEmail(Request $request)
+        {
+            $request->validate([
+                'email' => 'required|email',
+                'subject' => 'required|string|max:255',
+                'message' => 'required|string',
+            ]);
+        
+            Mail::raw($request->message, function ($message) use ($request) {
+                $message->to($request->email)
+                        ->subject($request->subject);
+            });
+        
+            session(['message' => 'success', 'errmsg' => 'Email sent successfully!.']);
+            return redirect()->back();
         }
     
 }

@@ -1,63 +1,6 @@
 @extends('admin.layout')
 @section('content')
-
-<div class="page-content" style="padding-top:30px;">
-    <div class="main-wrapper container">   
-        <div class="row">
-            <div class="col-xl">
-                <div class="row">
-                    <div class="col-lg-8 ml-auto mr-auto">
-                        @if(Session::has('errmsg'))                 
-                            <div class="alert alert-{{Session::get('message')}} alert-dismissible">
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>  
-                                   <strong>{{Session::get('errmsg')}}</strong>
-                            </div>
-                            {{Session::forget('message')}}
-                            {{Session::forget('errmsg')}}
-                        @endif
-                        <br><br>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                    <h5 class="card-title">Add Web Hosting</h5>
-                        <form method="post" action="{{route('submit_web_hosting')}}">
-                            @csrf
-                            <div class="form-row">
-
-                                <div class="form-group col-md-12">
-                                    <label for="name">Hosting Name</label>
-                                    <input type="text" class="form-control" name="hostingname" id="name" placeholder="Enter Hosting name" required="">
-                                    @if ($errors->has('hostingname'))
-                                        <strong class="text-danger">{{ $errors->first('hostingname') }}</strong>                                  
-                                    @endif
-                                </div>
-                                
-                                <div class="form-group col-md-12">
-                                    <label for="name">Hosting Price</label>
-                                    <input type="text" class="form-control" name="hostingprice" id="name" placeholder="Enter Hosting price" required="">
-                                    @if ($errors->has('hostingprice'))
-                                        <strong class="text-danger">{{ $errors->first('hostingprice') }}</strong>                                  
-                                    @endif
-                                </div>
-
-                                <div class="form-group col-md-12">
-                                    <label for="description">Features</label>
-                                    <textarea id="content" class="form-control" name="feature" placeholder="Features" rows="5"></textarea>
-                                    @if ($errors->has('feature'))
-                                        <strong class="text-danger">{{ $errors->first('feature') }}</strong>                                  
-                                    @endif
-                                </div>                             
-                            </div>
-                            <button type="submit" class="btn btn-primary">Add Web Hosting</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+@include('admin.flash')
 <div class="page-content">
     <div class="page-info container">
         <nav aria-label="breadcrumb">
@@ -72,6 +15,12 @@
             <div class="col">
                 <div class="card">
                     <div class="card-body">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h5 class="card-title">Web Hosting List</h5>
+                            <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addHostingModal">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
                         <table id="complex-header" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -83,80 +32,103 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $i=1;
-                                    foreach($web_hosting as $pp) { ?>
-                                        <tr>
-                                            <td><?php echo $i; ?></td>
-                                            <td><?php echo $pp->hostingname; ?></td>
-                                            <td><?php echo $pp->hostingprice; ?></td>
-                                            <td><?php echo $pp->feature; ?></td>
-                                            <td>
-                                                <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myeditModal<?php echo $pp->id; ?>" ><i class="fa fa-edit"></i></a>
-                                                <a class="btn btn-danger btn-sm" onclick="alert('Are You Sure To Delete This?')" href="<?php echo route('delete_web_hosting',['id'=>''.$pp->id.'']) ?>" ><i class="fa fa-trash"></i></a>
-                                            </td>                                                                         
-                                        </tr>
-                                        <div class="modal" id="myeditModal<?php echo $pp->id; ?>">
-                                            <div class="modal-dialog modal-lg">
-                                                <div class="modal-content">
-                                                    <!-- Modal Header -->
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Update Web Hosting</h4>
-                                                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">&nbsp;&times;&nbsp;</button>
-                                                    </div>
-                                                    <!-- Modal body -->
-                                                     <div class="modal-body">
-                                                        <form method="post" action="{{route('update_web_hosting')}}">
-                                                            @csrf
-                                                            <div class="row">
-                                                                <div class="col-sm-12">
-                                                                    <div class="form-group bmd-form-group">
-                                                                        <label class="bmd-label-floating">Enter Hosting Name</label>
-                                                                        <input type="hidden" class="form-control" name="update" value="<?php echo $pp->id; ?>" autocomplete="off" required="" >
-                                                                        <input type="text" class="form-control" name="hostingname" value="<?php echo $pp->hostingname; ?>" autocomplete="off" required="" >
-                                                                        @if ($errors->has('hostingname'))
-                                                                        <strong class="text-danger">{{ $errors->first('hostingname') }}</strong>                                   
-                                                                        @endif
-                                                                    </div>                      
-                                                                </div>    
-                                                                
-                                                                <div class="col-sm-12">
-                                                                    <div class="form-group bmd-form-group">
-                                                                        <label class="bmd-label-floating">Enter Hosting Price</label>
-                                                                        <input type="hidden" class="form-control" name="update" value="<?php echo $pp->id; ?>" autocomplete="off" required="" >
-                                                                        <input type="text" class="form-control" name="hostingprice" value="<?php echo $pp->hostingprice; ?>" autocomplete="off" required="" >
-                                                                        @if ($errors->has('hostingprice'))
-                                                                        <strong class="text-danger">{{ $errors->first('hostingprice') }}</strong>                                   
-                                                                        @endif
-                                                                    </div>                      
-                                                                </div>  
+                                @php $i = 1; @endphp
+                                @foreach($web_hosting as $pp)
+                                    <tr>
+                                        <td>{{ $i++ }}</td>
+                                        <td>{{ $pp->hostingname }}</td>
+                                        <td>{{ $pp->hostingprice }}</td>
+                                        <td>{!! \Illuminate\Support\Str::limit(strip_tags($pp->feature), 60, '...') !!}</td>
+                                        <td>
+                                            <a class="btn btn-info btn-sm" data-toggle="modal" data-target="#viewModal{{ $pp->id }}"><i class="fa fa-eye"></i></a>
+                                            <a class="btn btn-success btn-sm" data-toggle="modal" data-target="#editModal{{ $pp->id }}"><i class="fa fa-edit"></i></a>
+                                            <a class="btn btn-danger btn-sm" onclick="return confirm('Are You Sure To Delete This?')" href="{{ route('delete_web_hosting', ['id' => $pp->id]) }}"><i class="fa fa-trash"></i></a>
+                                        </td>
+                                    </tr>
 
-                                                                <div class="col-sm-12">
-                                                                    <div class="form-group bmd-form-group">
-                                                                        <label class="bmd-label-floating">Enter Features</label>
-                                                                        <input type="hidden" class="form-control" name="update" value="<?php echo $pp->id; ?>" autocomplete="off" required="" >
-                                                                        <textarea class="ckeditor" name="feature" autocomplete="off" required=""><?php echo $pp->feature; ?></textarea>
-                                                                        @if ($errors->has('feature'))
-                                                                        <strong class="text-danger">{{ $errors->first('feature') }}</strong>                                   
-                                                                        @endif
-                                                                    </div>                      
-                                                                </div>                                                                            
-                                                                <div class="col-sm-4">
-                                                                    <div class="form-group bmd-form-group">
-                                                                        <button type="submit" class="btn btn-success btn-block">Update</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </form>
-                                                    </div>
+                                    <!-- View Detail Modal -->
+                                    <div class="modal fade" id="viewModal{{ $pp->id }}" tabindex="-1" role="dialog">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-info text-white">
+                                                    <h5 class="modal-title text-white">Hosting Details</h5>
+                                                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p><strong>Hosting Name:</strong> {{ $pp->hostingname }}</p>
+                                                    <p><strong>Hosting Price:</strong> {{ $pp->hostingprice }}</p>
+                                                    <p><strong>Features:</strong></p>
+                                                    <div>{!! $pp->feature !!}</div>
                                                 </div>
                                             </div>
                                         </div>
-                                <?php $i++;
-                                } ?> 
+                                    </div>
+
+                                    <!-- Edit Modal -->
+                                    <div class="modal fade" id="editModal{{ $pp->id }}" tabindex="-1" role="dialog">
+                                        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title text-white">Update Web Hosting</h5>
+                                                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="post" action="{{ route('update_web_hosting') }}">
+                                                        @csrf
+                                                        <input type="hidden" name="update" value="{{ $pp->id }}">
+                                                        <div class="form-group">
+                                                            <label>Hosting Name <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="hostingname" value="{{ $pp->hostingname }}" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Hosting Price <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" name="hostingprice" value="{{ $pp->hostingprice }}" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Features</label>
+                                                            <textarea class="form-control ckeditor" name="feature" rows="5">{{ $pp->feature }}</textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-success">Update</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach 
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Hosting Modal -->
+<div class="modal fade" id="addHostingModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title text-white">Add Web Hosting</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{{ route('submit_web_hosting') }}">
+                    @csrf
+                    <div class="form-group">
+                        <label>Hosting Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="hostingname" placeholder="Enter Hosting name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hosting Price <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="hostingprice" placeholder="Enter Hosting price" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Features</label>
+                        <textarea class="form-control ckeditor" name="feature" placeholder="Enter Features" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Web Hosting</button>
+                </form>
             </div>
         </div>
     </div>

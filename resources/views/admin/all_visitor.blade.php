@@ -18,11 +18,11 @@
                     <div class="card-body">
                         <div class="table-responsive">
                         <table id="complex-header" class="table table-striped table-bordered" style="width:100%">
-                            <thead>
+                            <thead class="bg-primary">
                                 <tr>
-                                    <th>Sl. No.</th>
-                                    <th>IP Address</th>
-                                    <th>Date</th>
+                                    <th class="text-white">Sl. No.</th>
+                                    <th class="text-white">IP Address</th>
+                                    <th class="text-white">Date</th>
                                     
                                 </tr>
                             </thead>

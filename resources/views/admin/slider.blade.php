@@ -15,13 +15,7 @@
             <div class="col">
                 <div class="card">
                     <div class="card-body">
-                        @if(Session::has('message'))
-                        <div id="flash-message" class="alert alert-success shadow"
-                            style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 250px;">
-                            {{ Session::get('message') }}
-                        </div>
-                        @endif
-
+                    @include('admin.flash')
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h4>Banner List</h4>
                             <button class="btn btn-primary btn-sm" onclick="openBannerModal()">+ Add Banner</button>
@@ -113,16 +107,6 @@ function editBanner(banner) {
     document.getElementById('previewImage').innerHTML = `<img src="public/upload/banner/${banner.image}" height="50">`;
     $('#bannerModal').modal('show');
 }
-
-// Auto-hide top-right flash message
-setTimeout(function() {
-    let msg = document.getElementById('flash-message');
-    if (msg) {
-        msg.style.transition = 'opacity 0.5s ease';
-        msg.style.opacity = '0';
-        setTimeout(() => msg.remove(), 500);
-    }
-}, 3000);
 </script>
 
 @endsection

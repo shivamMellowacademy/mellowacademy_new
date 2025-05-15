@@ -198,6 +198,8 @@ Route::get('subcategory','App\Http\Controllers\admincontroller@subcategory')->na
 Route::post('submit_subcategory','App\Http\Controllers\admincontroller@submit_subcategory')->name('submit_subcategory');
 Route::post('update_subcategory','App\Http\Controllers\admincontroller@update_subcategory')->name('update_subcategory');
 Route::get('delete_subcategory/{id}','App\Http\Controllers\admincontroller@delete_subcategory')->name('delete_subcategory');
+Route::get('search-subcategory','App\Http\Controllers\admincontroller@searchSubcategory')->name('search_subcategory');
+
 
 
 Route::get('about','App\Http\Controllers\admincontroller@about')->name('about');
@@ -358,6 +360,8 @@ Route::post('premium-points-update','App\Http\Controllers\admincontroller@premiu
 Route::post('premium-points-delete','App\Http\Controllers\admincontroller@premiumPointsDelete')->name('premium_points_delete');
 
 Route::post('premium-price-store','App\Http\Controllers\admincontroller@premiumPriceStore')->name('premium_price_store');
+Route::post('send-email-notification','App\Http\Controllers\admincontroller@sendEmail')->name('send.email.notification');
+
 
 /*
 ---------------------------------------------------------------------------------------------------------

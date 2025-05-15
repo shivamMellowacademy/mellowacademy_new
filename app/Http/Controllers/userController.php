@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Http;
+<<<<<<< HEAD
+=======
+use URL;
+>>>>>>> 80721d21ce79ec7ebb4074a76c92dda668d8638a
 
 class userController extends Controller
 {
@@ -151,7 +155,11 @@ class userController extends Controller
 	            
 	            $files = [
                     public_path('front/assets/images/Logo-01.png'),
+<<<<<<< HEAD
                     // url::$link,
+=======
+                    URL::$link,
+>>>>>>> 80721d21ce79ec7ebb4074a76c92dda668d8638a
                 ];
                 
 

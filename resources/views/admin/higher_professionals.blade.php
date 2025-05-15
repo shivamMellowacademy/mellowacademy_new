@@ -1,143 +1,126 @@
 @extends('admin.layout')
 @section('content')
-
+@include('admin.flash')
 <div class="page-content" style="padding-top:30px;">
-    <div class="main-wrapper container">   
-        <div class="row">
-            <div class="col-xl">
-                <div class="row">
-                    <div class="col-lg-8 ml-auto mr-auto">
-	                    @if(Session::has('errmsg'))                 
-	                        <div class="alert alert-{{Session::get('message')}} alert-dismissible">
-	                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>  
-	                    	       <strong>{{Session::get('errmsg')}}</strong>
-	                        </div>
-	                        {{Session::forget('message')}}
-	                        {{Session::forget('errmsg')}}
-	                    @endif
-	                    <br><br>
-	                </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                    <h5 class="card-title">Add Higher Professional Details</h5>
-                        <form method="post" action="{{route('submit_hig_prof')}}" enctype="multipart/form-data">
-	                        @csrf
-	                        <div class="form-row">
-	                            <div class="form-group col-md-6">
-	                            	<label for="heading">Heading</label>
-	                                <input type="text" class="form-control" name="heading" id="heading" placeholder="Enter Heading" required="">
-	                                @if ($errors->has('heading'))
-	                                	<strong class="text-danger">{{ $errors->first('heading') }}</strong>                                  
-	                               	@endif
-	                            </div>
-	                            
-	                            <div class="form-group col-sm-6">
-									<label for="image">Choose Image</label>
-									<input type="file" class="form-control" name="image" id="image" accept="image/*" required="" >
-									@if ($errors->has('image'))
-									<strong class="text-danger">{{ $errors->first('image') }}</strong>									
-									@endif
-								</div>
-	                        </div>
-	                        <button type="submit" class="btn btn-primary">Add Higher Professional</button>
-                        </form>
-                    </div>
-                </div>
-           	</div>
-        </div>
-   	</div>
-</div>
-
-<div class="page-content">
-    <div class="page-info container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="#">All Higher Professional</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Details</li>
-            </ol>
-        </nav>
-    </div>
     <div class="main-wrapper container">
+        <!-- Add Button -->
+        <div class="row mb-3">
+            <div class="col text-right">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addHigProfModal">
+                    + Add Higher Professional
+                </button>
+            </div>
+        </div>
+
+        <!-- Data Table -->
         <div class="row">
             <div class="col">
                 <div class="card">
                     <div class="card-body">
+                        <h5 class="card-title">All Higher Professional Details</h5>
                         <table id="complex-header" class="table table-striped table-bordered" style="width:100%">
-                            <thead>
+                            <thead class="bg-primary">
                                 <tr>
-                                    <th>Sl. No.</th>
-                                    <th>Heading</th>
-                                    <th>Image</th>
-                                    <th>Action</th>
+                                    <th class="text-white">Sl. No.</th>
+                                    <th class="text-white">Heading</th>
+                                    <th class="text-white">Image</th>
+                                    <th class="text-white">Action</th>
                                 </tr>
                             </thead>
-	                        <tbody>
-                               <?php $i=1;
-                                foreach($higher_professional as $hp) { ?>
+                            <tbody>
+                                @php $i = 1; @endphp
+                                @foreach($higher_professional as $hp)
                                     <tr>
-                                        <td><?php echo $i; ?></td>
-                                        <td><?php echo $hp->heading; ?></td>
-                                        <td><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/hig_prof/'.$hp->image.'') ?>" style="height:80px"></td>
+                                        <td>{{ $i++ }}</td>
+                                        <td>{{ $hp->heading }}</td>
+                                        <td><img src="{{ asset('public/upload/hig_prof/' . $hp->image) }}" class="img-fluid img-thumbnail" style="height:80px;"></td>
                                         <td>
-                                            <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myeditModal<?php echo $hp->id; ?>" ><i class="fa fa-edit"></i></a>
-                                            <a class="btn btn-danger btn-sm" onclick="alert('Are You Sure To Delete This?')" href="<?php echo route('delete_hig_prof',['id'=>''.$hp->id.'']) ?>" ><i class="fa fa-trash"></i></a>
-                                        </td>                                                                         
+                                            <a class="btn btn-success btn-sm" data-toggle="modal" data-target="#myeditModal{{ $hp->id }}"><i class="fa fa-edit"></i></a>
+                                            <a class="btn btn-danger btn-sm" onclick="return confirm('Are You Sure To Delete This?')" href="{{ route('delete_hig_prof', ['id' => $hp->id]) }}"><i class="fa fa-trash"></i></a>
+                                        </td>
                                     </tr>
-                                    <div class="modal" id="myeditModal<?php echo $hp->id; ?>">
-                                        <div class="modal-dialog modal-lg">
+
+                                    <!-- Edit Modal -->
+                                    <div class="modal fade" id="myeditModal{{ $hp->id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ $hp->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg" role="document">
                                             <div class="modal-content">
-                                                <!-- Modal Header -->
-                                                <div class="modal-header">
-                                                    <h4 class="modal-title">Update Higher Professional</h4>
-                                                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">&nbsp;&times;&nbsp;</button>
+                                                <div class="modal-header bg-primary">
+                                                    <h5 class="modal-title text-white" id="editModalLabel{{ $hp->id }}">Edit Higher Professional</h5>
+                                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
                                                 </div>
-                                                <!-- Modal body -->
-                                                 <div class="modal-body">
-                                                    <form method="post" action="{{route('update_hig_prof')}}" enctype="multipart/form-data">
-                                                        @csrf
-                                                        <div class="row">
-                                                            <div class="col-sm-6">
-                                                                <div class="form-group bmd-form-group">
-                                                                    <label class="bmd-label-floating">Enter Heading</label>
-                                                                    <input type="hidden" class="form-control" name="update" value="<?php echo $hp->id; ?>" autocomplete="off" required="" >
-                                                                    <input type="text" class="form-control" name="heading" value="<?php echo $hp->heading; ?>" autocomplete="off" required="" >
-                                                                    @if ($errors->has('heading'))
-                                                                    <strong class="text-danger">{{ $errors->first('heading') }}</strong>                                   
-                                                                    @endif
-                                                                </div>                      
-                                                            </div>                  
-                                                            
-                                                            <div class="col-sm-6">
-                                                                <div class="form-group bmd-form-group is-filled">
-                                                                    <label class="bmd-label-floating">Choose Image</label>
-                                                                    <input type="file" class="form-control" name="image" accept="image/*"  autocomplete="off" >
-                                                                    <input type="hidden" class="form-control" name="old_image" value="<?php echo $hp->image; ?>"  autocomplete="off" >
-                                                                    <img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/hig_prof/'.$hp->image.'') ?>" style="height:30px;width:40px;">
-                                                                    @if ($errors->has('image'))
-                                                                    <strong class="text-danger">{{ $errors->first('image') }}</strong>                                  
-                                                                    @endif
-                                                                </div>
+                                                <form method="post" action="{{ route('update_hig_prof') }}" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <div class="modal-body">
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-6">
+                                                                <label>Heading</label>
+                                                                <input type="hidden" name="update" value="{{ $hp->id }}">
+                                                                <input type="text" class="form-control" name="heading" value="{{ $hp->heading }}" required>
                                                             </div>
-                                                            <div class="col-sm-4">
-                                                                <div class="form-group bmd-form-group">
-                                                                    <button type="submit" class="btn btn-success btn-block">Update</button>
-                                                                </div>
+                                                            <div class="form-group col-md-6">
+                                                                <label>Image</label>
+                                                                <input type="file" class="form-control" name="image" accept="image/*">
+                                                                <input type="hidden" name="old_image" value="{{ $hp->image }}">
+                                                                <img src="{{ asset('public/upload/hig_prof/' . $hp->image) }}" class="img-fluid img-thumbnail mt-2" style="height:40px; width:50px;">
                                                             </div>
                                                         </div>
-                                                    </form>
-                                                </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-success">Update</button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-                                    <?php $i++;
-                                    } ?>
-	                        </tbody>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-       	</div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addHigProfModal" tabindex="-1" role="dialog" aria-labelledby="addHigProfLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title text-white" id="addHigProfLabel">Add Higher Professional Details</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{{ route('submit_hig_prof') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="heading">Heading <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="heading" id="heading" placeholder="Enter Heading" required>
+                            @if ($errors->has('heading'))
+                                <small class="text-danger">{{ $errors->first('heading') }}</small>
+                            @endif
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="image">Image <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" name="image" id="image" accept="image/*" required>
+                            @if ($errors->has('image'))
+                                <small class="text-danger">{{ $errors->first('image') }}</small>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Add Details</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

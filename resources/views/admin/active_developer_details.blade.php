@@ -1,5 +1,11 @@
 @extends('admin.layout')
 @section('content')
+@include('admin.flash')
+<style>
+    .dropdown-item {
+        cursor: pointer;
+    }
+</style>
 
 <div class="page-content" style="padding-top:30px;">
     <div class="page-info container">
@@ -10,311 +16,387 @@
             </ol>
         </nav>
     </div>
-    
+
     <div class="main-wrapper container">
-        <div class="row">
-            <div class="col">
-                 <a href="{{ route('developer_details') }}" class="btn btn-primary">Add Developer</a><br>
-            </div>
-        </div><br>
+    <div class="row mb-2">
+    <div class="col text-right">
+        <a href="{{ route('developer_details') }}" class="btn btn-primary">
+            <i class="fa fa-plus"></i> Add Developer
+        </a>
+    </div>
+    </div>
         <div class="row">
             <div class="col">
                 <div class="card">
                     <div class="card-body">
-                        <div class="table-responsive"> 
+                        <div class="table-responsive">
                             <table id="complex-header" class="table table-striped table-bordered" style="width:100%">
-                                <thead>
+                                <thead class="bg-primary">
                                     <tr>
-                                        <th>Sl. No.</th>
-                                        <th>Higher Professional</th>
-                                        <th>Full Name</th>
-                                        <th>View Profile</th>
-                                        <th>Bank Details</th>
-                                        <th>Project Details</th>
-                                        <th>Status</th>
-                                        <th>Change Status</th>
-                                        <th>Available Date</th>
-                                        <th>Option</th>
-                                        <th>Transaction Details</th>
-                                        <th>Action</th>
+                                        <th class="text-white">Sl. No.</th>
+                                        <th class="text-white">Higher Professional</th>
+                                        <th class="text-white">Full Name</th>
+                                        <th class="text-white">Change Status</th>
+                                        <th class="text-white">Is Login Active?</th>
+                                        <th class="text-white">Action</th>
                                     </tr>
                                 </thead>
-    	                        <tbody>
-                                   <?php $i=1;
-                                    foreach($developer_details as $s) { ?>
-                                        <tr>
-                                            <td><?php echo $i; ?></td>
-                                            <td><?php echo $s->heading; ?></td>
-                                            <td><?php echo $s->name; ?>  <?php echo $s->last_name; ?></td>
-                                            <td><a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myModal<?php echo $s->dev_id; ?>" ><i class="fa fa-show"></i>Details</a></td>
-                                            <td><a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myBankModal<?php echo $s->dev_id; ?>" ><i class="fa fa-show"></i>Details</a></td>
-                                            <td><a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myprojectModal<?php echo $s->dev_id; ?>" ><i class="fa fa-show"></i>Details</a></td>
-                                            <td><?php echo $s->developer_status; ?></td>
-                                            <td> 
-
-                                                <select name="developer_status"  onchange="update_status(this.value,{{$s->dev_id}})" style="border-radius:4px; height:35px; color:currentColor;">
-                                                    <option value=""> Select Status </option>
-                                                    
-                                                    <option value="Booked">Book Now</option>
-                                                    
-                                                </select>
-
-                                            </td>
-                                            <td>
-                                                <a class="btn btn-success btn-sm" href="javascript:void();" data-toggle="modal" data-target="#myeditModal<?php echo $s->dev_id; ?>" ><i class="fa fa-edit"></i></a>
-                                                
-                                            </td>
-                                            <td>
-                                                <?php if($s->login_status == 0){ ?>
-                                                    <a class="btn btn-danger btn-sm" href="<?php echo route('developer_login_status',['dev_id'=>''.$s->dev_id.'']) ?>"><i class="fa fa-show"></i>Deactive</a>
-                                                <?php } else{?>
-                                                    <a class="btn btn-success btn-sm" href="<?php echo route('developer_login_status',['dev_id'=>''.$s->dev_id.'']) ?>"><i class="fa fa-show"></i>Active</a>
-                                                <?php } ?>                                            
-                                            </td>
-
-                                            <td>
-                                                <a class="btn btn-success btn-sm" href="<?php echo route('developer_transaction_details',['dev_id'=>''.$s->dev_id.'']) ?>" target="_blank" ><i class="fa fa-show"></i>Details</a>
-                                                
-                                            </td>  
-                                           
-                                            <td>
-                                                <a class="btn btn-success btn-sm" href="<?php echo route('developer_details_update',['dev_id'=>''.$s->dev_id.'']) ?>" ><i class="fa fa-edit"></i></a>
-                                                <a class="btn btn-danger btn-sm" onclick="alert('Are You Sure To Delete This?')" href="<?php echo route('delete_developer_details',['dev_id'=>''.$s->dev_id.'']) ?>" ><i class="fa fa-trash"></i></a>
-                                            </td>                                                                         
-                                        </tr>
-
-                                        <div class="modal" id="myModal<?php echo $s->dev_id; ?>">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">About Details</h4>
-                                                    </div>
-                                                  <div class="modal-body">
-                                                    <p>Email : <?php echo $s->email; ?></p>
-                                                    <p>Description : <?php echo $s->description; ?></p>
-                                                    <p>Conatct Number : <?php echo $s->phone; ?></p>
-
-                                                    <?php if($s->available_start_date == ''){ ?>
-                                                        <p>Available Date : </p>
-                                                    <?php }else{?>
-                                                        <p>Available Date : <b style="color:green"><?php echo $s->available_start_date; ?>  To  <?php echo $s->available_end_date; ?></b></p>
-                                                    <?php } ?>
-                                                    <p>Job : <?php echo $s->job; ?></p>
-                                                    <p>Per Hr : <?php echo $s->perhr; ?></p>
-                                                    <p>Total Hours : <?php echo $s->total_hours; ?></p>
-                                                    <p>Rating : <?php echo $s->rating; ?></p>
-                                                    <p>Address : <?php echo $s->address; ?></p>
-                                                    <p>Language : <?php echo $s->language; ?></p>
-                                                    <p>University : <?php echo $s->education; ?></p>
-                                                    <p>Collage Name : <?php echo $s->clg_name; ?></p>
-                                                    <p>Degree : <?php echo $s->degree; ?></p>
-                                                    <p>Percentage : <?php echo $s->percentage; ?></p>
-                                                    <p>Passing Year : <?php echo $s->passing_year; ?></p>
-                                                    <p>Skills : <?php echo $s->skills; ?></p>
-                                                    <p>Resume : <?php echo $s->resume; ?></p>
-                                                    <p>Completed Job : <?php echo $s->completed_job; ?></p>
-                                                    <p>Image : <div class="geeks"><a href="<?php echo URL::asset('public/upload/developer/'.$s->image.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/developer/'.$s->image.'') ?>" style="height:150px"></a></div></p>
-                                                    <p>Portfolio Image : <div class="geeks"><a href="<?php echo URL::asset('public/upload/portfolio/'.$s->portfolio_image.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/portfolio/'.$s->portfolio_image.'') ?>" style="height:150px"></a></div></p>
-                                                    
-                                                  </div>
-                                                  <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                  </div>
+                                <tbody>
+                                    @foreach($developer_details as $i => $s)
+                                    <tr>
+                                        <td>{{ $i + 1 }}</td>
+                                        <td>{{ $s->heading }}</td>
+                                        <td>{{ $s->name }} {{ $s->last_name }}</td>
+                                        <td>
+                                            <select name="developer_status"
+                                                onchange="update_status(this.value, {{ $s->dev_id }})"
+                                                class="form-control">
+                                                <option value="">Select Status</option>
+                                                <option value="Booked"
+                                                    {{ $s->developer_status == 'Booked' ? 'selected' : '' }}>Booked
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            @if($s->login_status == 0)
+                                            <a class="btn btn-danger btn-sm"
+                                                href="{{ route('developer_login_status', ['dev_id' => $s->dev_id]) }}">
+                                                <i class="fa fa-times"></i> No
+                                            </a>
+                                            @else
+                                            <a class="btn btn-success btn-sm"
+                                                href="{{ route('developer_login_status', ['dev_id' => $s->dev_id]) }}">
+                                                <i class="fa fa-check"></i> Yes
+                                            </a>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-success dropdown-toggle" type="button"
+                                                    data-toggle="dropdown">
+                                                    Actions
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" data-toggle="modal"
+                                                        data-target="#myModal{{ $s->dev_id }}">
+                                                        <i class="fa fa-user"></i> Profile
+                                                    </a>
+                                                    <a class="dropdown-item" data-toggle="modal"
+                                                        data-target="#myBankModal{{ $s->dev_id }}">
+                                                        <i class="fa fa-university"></i> Bank
+                                                    </a>
+                                                    <a class="dropdown-item" data-toggle="modal"
+                                                        data-target="#myprojectModal{{ $s->dev_id }}">
+                                                        <i class="fa fa-folder-open"></i> Project
+                                                    </a>
+                                                    <a class="dropdown-item" data-toggle="modal"
+                                                        data-target="#myeditModal{{ $s->dev_id }}">
+                                                        <i class="fa fa-calendar"></i> Availability
+                                                    </a>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('developer_transaction_details', ['dev_id' => $s->dev_id]) }}"
+                                                        target="_blank">
+                                                        <i class="fa fa-credit-card"></i> Transaction
+                                                    </a>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('developer_details_update', ['dev_id' => $s->dev_id]) }}">
+                                                        <i class="fa fa-edit"></i> Edit
+                                                    </a>
+                                                    <a class="dropdown-item text-danger"
+                                                        href="{{ route('delete_developer_details', ['dev_id' => $s->dev_id]) }}"
+                                                        onclick="return confirm('Are you sure?')">
+                                                        <i class="fa fa-trash"></i> Delete
+                                                    </a>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </td>
 
-                                        <div class="modal" id="myeditModal<?php echo $s->dev_id; ?>">
-                                            <div class="modal-dialog modal-lg">
-                                                <div class="modal-content">
-                                                    <!-- Modal Header -->
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Add available Date</h4>
-                                                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">&nbsp;&times;&nbsp;</button>
-                                                    </div>
-                                                    <!-- Modal body -->
-                                                     <div class="modal-body">
-                                                        <form method="post" action="{{ route('developer_available_update') }}" >
-                                                            @csrf
-                                                            <div class="row">
-                                                                <div class="col-sm-6">
-                                                                    <div class="form-group bmd-form-group">
-                                                                        <label class="bmd-label-floating">Start Date</label>
-                                                                        <input type="hidden" class="form-control" name="update" value="<?php echo $s->dev_id; ?>" autocomplete="off" required="" >
-                                                                        <input type="date" class="form-control" name="available_start_date"  autocomplete="off" required="" >
-                                                                        @if ($errors->has('available_start_date'))
-                                                                        <strong class="text-danger">{{ $errors->first('available_start_date') }}</strong>                                   
-                                                                        @endif
-                                                                    </div>                      
-                                                                </div> 
+                                    </tr>
 
+                                    {{-- Profile Modal --}}
+                                    <div class="modal fade" id="myModal{{ $s->dev_id }}">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h4 class="modal-title text-white">{{ $s->name }}
+                                                        {{ $s->last_name }} - Profile
+                                                    </h4>
+                                                    <button type="button" class="close text-white"
+                                                        data-dismiss="modal">&times;</button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <div class="row">
+
+                                                        {{-- Profile Image & Info --}}
+                                                        <div class="col-md-4 text-center">
+                                                            @if(!empty($s->image))
+                                                            <img src="{{ asset('public/upload/developer/'.$s->image) }}"
+                                                                class="rounded-circle img-thumbnail mb-3"
+                                                                style="width:150px; height:150px;">
+                                                            @else
+                                                            <img src="{{ asset('public/client/assets/images/avatars/profile-image.png') }}"
+                                                                class="rounded-circle img-thumbnail mb-3"
+                                                                style="width:150px; height:150px;">
+                                                            @endif
+
+
+                                                            <h5 class="font-weight-bold">{{ $s->name }}
+                                                                {{ $s->last_name }}</h5>
+                                                            <p class="text-muted">{{ $s->job }}</p>
+                                                            <span class="badge badge-info">Rating:
+                                                                {{ $s->rating }}/5</span><br><br>
+                                                            <span
+                                                                class="badge badge-success">{{ $s->developer_status }}</span>
+                                                        </div>
+
+                                                        {{-- Developer Details --}}
+                                                        <div class="col-md-8">
+                                                            <h5>Summary</h5>
+                                                            <p>{!! $s->description !!}</p>
+
+                                                            <div class="row mt-3">
                                                                 <div class="col-sm-6">
-                                                                    <div class="form-group bmd-form-group">
-                                                                        <label class="bmd-label-floating">End Date</label>
-                                                                        <input type="hidden" class="form-control" name="update" value="<?php echo $s->dev_id; ?>" autocomplete="off" required="" >
-                                                                        <input type="date" class="form-control" name="available_end_date"  autocomplete="off" required="" >
-                                                                        @if ($errors->has('available_end_date'))
-                                                                        <strong class="text-danger">{{ $errors->first('available_end_date') }}</strong>                                   
+                                                                    <p><strong>Email:</strong> {{ $s->email }}</p>
+                                                                    <p><strong>Phone:</strong> {{ $s->phone }}</p>
+                                                                    <p><strong>Per Hour:</strong> ₹{{ $s->perhr }}</p>
+                                                                    <p><strong>Total Hours:</strong>
+                                                                        {{ $s->total_hours }}</p>
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <p><strong>Address:</strong> {{ $s->address }}</p>
+                                                                    <p><strong>Language:</strong> {{ $s->language }}</p>
+                                                                    <p><strong>Available:</strong>
+                                                                        @if($s->available_start_date)
+                                                                        <span
+                                                                            class="text-success">{{ $s->available_start_date }}
+                                                                            to {{ $s->available_end_date }}</span>
+                                                                        @else
+                                                                        <span class="text-danger">Not set</span>
                                                                         @endif
-                                                                    </div>                      
-                                                                </div>  
-                                                                
-                                                                    
-                                                                <div class="col-sm-4">
-                                                                    <div class="form-group bmd-form-group">
-                                                                        <button type="submit" class="btn btn-success btn-block">Update</button>
-                                                                    </div>
+                                                                    </p>
                                                                 </div>
                                                             </div>
-                                                        </form>
-                                                    </div>                                               
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        <div class="modal" id="myBankModal<?php echo $s->dev_id; ?>">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h4 class="modal-title">Bank Details</h4>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Name Of Bank</h5>
-                                                            <p class="card-text"><?php echo $s->bank_name; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Branch Name</h5>
-                                                            <p class="card-text"><?php echo $s->branch_name; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Account Name</h5>
-                                                            <p class="card-text"><?php echo $s->acct_name; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Account Number</h5>
-                                                            <p class="card-text"><?php echo $s->account_number; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">IFC Code</h5>
-                                                            <p class="card-text"><?php echo $s->ifc_code; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Swift Code</h5>
-                                                            <p class="card-text"><?php echo $s->micr_number; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Passbook Image</h5>
-                                                            <p class="card-text"><div class="geeks"><a href="<?php echo URL::asset('public/upload/passbook/'.$s->passbook.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/passbook/'.$s->passbook.'') ?>" style="height:200px"></a></div></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="card">
-                                                          <div class="card-body">
-                                                            <h5 class="card-title">Type Of Account</h5>
-                                                            <p class="card-text"><?php echo $s->account_Type; ?></p>
-                                                          </div>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                  <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                  </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                            <hr>
 
-                                        <div class="modal" id="myprojectModal<?php echo $s->dev_id; ?>">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h4 class="modal-title">Project Details</h4>
-                                                </div>
-                                                <?php foreach ($developer_project_details as $k) {
-                                                    if($k->developer_id == $s->dev_id){
-                                                ?>
-                                                <div class="modal-body">
-                                                    <div class="card">
-                                                      <div class="card-body">
-                                                        <h5 class="card-title">Project Image</h5>
-                                                        <p class="card-text"> <div class="geeks"><a href="<?php echo URL::asset('public/upload/screenshot/'.$k->screenshot_image.'') ?>" target="_blank"><img class="img-fluid img-thumbnail" src="<?php echo URL::asset('public/upload/screenshot/'.$k->screenshot_image.'') ?>" style="height:200px"></a></div></p>
-                                                      </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="card">
-                                                      <div class="card-body">
-                                                        <h5 class="card-title">Project Link</h5>
-                                                        <p class="card-text"><?php echo $k->project_link; ?></p>
-                                                      </div>
-                                                    </div>
-                                                </div>
-                                                
+                                                            <h5>Education</h5>
+                                                            <p><strong>University:</strong> {{ $s->education }}</p>
+                                                            <p><strong>College:</strong> {{ $s->clg_name }}</p>
+                                                            <p><strong>Degree:</strong> {{ $s->degree }}
+                                                                ({{ $s->passing_year }})</p>
+                                                            <p><strong>Percentage:</strong> {{ $s->percentage }}%</p>
 
-                                                <?php } }?>
-                                                
-                                              <div class="modal-footer">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                              </div>
+                                                            <hr>
+
+                                                            <h5>Skills</h5>
+                                                            @foreach(explode(',', $s->skills) as $skill)
+                                                            <p>{!! trim($skill) !!}</p>
+                                                            @endforeach
+
+                                                            <hr>
+
+                                                            <h5>Resume</h5>
+                                                            <a href="{{ asset('public/upload/resume/'.$s->resume) }}"
+                                                                target="_blank" class="btn btn-outline-primary btn-sm">
+                                                                View Resume
+                                                            </a>
+
+                                                            <h5 class="mt-4">Portfolio</h5>
+                                                            <img src="{{ asset('public/upload/portfolio/'.$s->portfolio_image) }}"
+                                                                class="img-fluid rounded shadow-sm"
+                                                                style="height:120px;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal-footer bg-light">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Close</button>
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                        <?php $i++;
-                                        } ?>
-    	                        </tbody>
+
+
+                                    {{-- Availability Modal --}}
+                                    <div class="modal fade" id="myeditModal{{ $s->dev_id }}">
+                                        <div class="modal-dialog modal-md">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Update Available Dates</h5>
+                                                    <button type="button" class="close"
+                                                        data-dismiss="modal">&times;</button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="POST"
+                                                        action="{{ route('developer_available_update') }}">
+                                                        @csrf
+                                                        <input type="hidden" name="update" value="{{ $s->dev_id }}">
+                                                        <div class="form-group">
+                                                            <label>Start Date</label>
+                                                            <input type="date" name="available_start_date"
+                                                                class="form-control" required>
+                                                            @error('available_start_date')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>End Date</label>
+                                                            <input type="date" name="available_end_date"
+                                                                class="form-control" required>
+                                                            @error('available_end_date')
+                                                            <span class="text-danger">{{ $message }}</span>
+                                                            @enderror
+                                                        </div>
+                                                        <button type="submit" class="btn btn-success">Update</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Add your bank details modal --}}
+                                    <div class="modal fade" id="myBankModal{{ $s->dev_id }}" tabindex="-1" role="dialog"
+                                        aria-labelledby="bankModalLabel{{ $s->dev_id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title text-white"
+                                                        id="bankModalLabel{{ $s->dev_id }}">Bank Details</h5>
+                                                    <button type="button" class="close text-white" data-dismiss="modal"
+                                                        aria-label="Close">&times;</button>
+                                                </div>
+                                                <div class="modal-body p-4">
+                                                    <div class="row">
+                                                        @php
+                                                        $fields = [
+                                                        'Name Of Bank' => $s->bank_name,
+                                                        'Branch Name' => $s->branch_name,
+                                                        'Account Name' => $s->acct_name,
+                                                        'Account Number' => $s->account_number,
+                                                        'IFC Code' => $s->ifc_code,
+                                                        'Swift Code' => $s->micr_number,
+                                                        'Type Of Account' => $s->account_Type,
+                                                        ];
+                                                        @endphp
+
+                                                        @foreach($fields as $label => $value)
+                                                        <div class="col-md-6 mb-3">
+                                                            <div class="card h-100">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title font-weight-bold">{{ $label }}
+                                                                    </h6>
+                                                                    <p class="card-text">{{ $value ?: 'N/A' }}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @endforeach
+
+                                                        @if(!empty($s->passbook))
+                                                        <div class="col-12 mt-3">
+                                                            <div class="card">
+                                                                <div class="card-body text-center">
+                                                                    <h6 class="card-title font-weight-bold">Passbook
+                                                                        Image</h6>
+                                                                    <a href="{{ asset('public/upload/passbook/' . $s->passbook) }}"
+                                                                        target="_blank">
+                                                                        <img src="{{ asset('public/upload/passbook/' . $s->passbook) }}"
+                                                                            class="img-fluid img-thumbnail"
+                                                                            style="max-height: 250px;">
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer bg-light">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Add your project details modal --}}
+                                    <div class="modal fade" id="myprojectModal{{ $s->dev_id }}" tabindex="-1"
+                                        role="dialog" aria-labelledby="projectModalLabel{{ $s->dev_id }}"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title text-white"
+                                                        id="projectModalLabel{{ $s->dev_id }}">
+                                                        Project Details</h5>
+                                                    <button type="button" class="close text-white" data-dismiss="modal"
+                                                        aria-label="Close">&times;</button>
+                                                </div>
+                                                <div class="modal-body p-4">
+                                                    <div class="row">
+                                                        @foreach($developer_project_details as $k)
+                                                        @if($k->developer_id == $s->dev_id)
+                                                        <div class="col-md-6 mb-4">
+                                                            <div class="card h-100">
+                                                                <div class="card-body text-center">
+                                                                    <h6 class="card-title font-weight-bold">Project
+                                                                        Screenshot</h6>
+                                                                    <a href="{{ asset('public/upload/screenshot/' . $k->screenshot_image) }}"
+                                                                        target="_blank">
+                                                                        <img src="{{ asset('public/upload/screenshot/' . $k->screenshot_image) }}"
+                                                                            class="img-fluid img-thumbnail"
+                                                                            style="max-height: 200px;">
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mb-4">
+                                                            <div class="card h-100">
+                                                                <div class="card-body">
+                                                                    <h6 class="card-title font-weight-bold">Project Link
+                                                                    </h6>
+                                                                    <p class="card-text">
+                                                                        <a href="{{ $k->project_link }}" target="_blank"
+                                                                            class="btn btn-sm btn-primary">Click
+                                                                            here</a>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @endif
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer bg-light">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    @endforeach
+                                </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-       	</div>
+        </div>
     </div>
 </div>
 
 <script>
-    $(document).ready(function() {
-        var i=1;
-        $('.add').on('click', function() {
-            var task = $("#task").val();
-            i++;  
-            $('#dynamic_field').append('<tr id="row'+i+'" class="dynamic-added"><td><input type="text" class="form-control" name="education[]" id="task" required="" ></td><td><input type="text" class="form-control" name="clg_name[]" id="task" required="" ></td><td><input type="text" class="form-control" name="degree[]" id="task" required="" ></td><td><input type="text" class="form-control" name="percentage[]" id="task" required="" ></td><td><input type="text" class="form-control" name="passing_year[]" id="task" required="" ></td><td><button type="button" name="remove" id="'+i+'" class="btn btn-danger btn_remove">X</button></td></tr>');  
-            
-            $(document).on('click', '.btn_remove', function(){  
-                   var button_id = $(this).attr("id");   
-                   $('#row'+button_id+'').remove();  
-              });
-            
-        });
-    });
+function update_status(status, dev_id) {
+    if (status !== '') {
+        if (confirm('Are you sure you want to update status?')) {
+            window.location.href = `/update-status/${dev_id}/${status}`;
+        }
+    }
+}
 </script>
-
-
 
 @endsection
