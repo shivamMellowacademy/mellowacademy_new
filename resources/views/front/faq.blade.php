@@ -1,43 +1,45 @@
 @extends('front.layout')
+
 @section('content')
-
-    <section class="blog blog-category blog-animated">
-
-        <header>
-            <div class="container">
-                <h2 class="title">Frequently Asked Questions</h2>
-            </div>
-        </header>
-
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="clearfix">
-                        <div class="accordion" id="accordionExample">
-                            <?php
-                            $i=1;
-                            foreach($faq_details as $f) { ?>
-                            
-                            <div class="card">
-                                <div class="card-header" id="heading<?php echo $i; ?>">
-                                    <a class="card-link<?php if($i>1) echo "collapsed"; ?> text-dark" data-toggle="collapse" data-target="#collapse<?php echo $i; ?>" aria-expanded="<?php echo ($i==1) ? 'true': 'false'; ?>" aria-controls="collapse<?php echo $i; ?>">
-                                        <?php echo $f->heading; ?>
-                                    </a>
-                                </div>
-                                <div id="collapse<?php echo $i; ?> text-dark" class="panel-collapse collapse show text-justify" aria-labelledby="heading<?php echo $i; ?>" data-parent="#accordionExample">
-                                    <div class="card-body text-dark">
-                                        <?php echo $f->description; ?>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <?php $i++;
-                            } ?>  
-                        </div>
-                    </div>
-                </div>                  
-            </div> 
+<section class="faq-section py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="title">Frequently Asked Questions</h2>
+            <p class="text-muted">Find answers to the most commonly asked questions.</p>
         </div>
-    </section>
-        
+
+        <div class="accordion" id="faqAccordion">
+            @foreach($faq_details as $index => $faq)
+            <div class="card mb-3 border-0 shadow-sm rounded">
+                <div class="card-header bg-white" id="heading{{ $index }}">
+                    <h2 class="mb-0">
+                        <button 
+                            class="btn btn-link btn-block text-left {{ $index !== 0 ? 'collapsed' : '' }}" 
+                            type="button" 
+                            data-toggle="collapse" 
+                            data-target="#collapse{{ $index }}" 
+                            aria-expanded="{{ $index === 0 ? 'true' : 'false' }}" 
+                            aria-controls="collapse{{ $index }}"
+                            style="font-size: 16px; font-weight: 600;"
+                        >
+                            {{ $faq->heading }}
+                        </button>
+                    </h2>
+                </div>
+
+                <div 
+                    id="collapse{{ $index }}" 
+                    class="collapse {{ $index === 0 ? 'show' : '' }}" 
+                    aria-labelledby="heading{{ $index }}" 
+                    data-parent="#faqAccordion"
+                >
+                    <div class="card-body text-dark text-justify">
+                        {!! $faq->description !!}
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
 @endsection

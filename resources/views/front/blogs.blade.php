@@ -15,7 +15,7 @@
                     </ol>
                     <h2 class="title">Blog grid</h2>
                     <div class="text text-dark">
-                        <p>Suspendisse scelerisque odio eu felis eleifend</p>
+                        <p class="text-dark">Suspendisse scelerisque odio eu felis eleifend</p>
                     </div>
                 </div>
             </header>
@@ -48,14 +48,14 @@
                                             <div class="date-wrapper">
                                                 <a href="<?php echo route('blog_details',['id'=>''.$b->id.'']) ?>">
                                                 <div class="date">
-                                                    <span><?php echo $b->month; ?></span>
-                                                    <strong><?php echo $b->day; ?></strong>
-                                                    <span><?php echo $b->year; ?></span>
+                                                    <span class="text-dark"><?php echo $b->month; ?></span>
+                                                    <strong class="text-dark"><?php echo $b->day; ?></strong>
+                                                    <span class="text-dark"><?php echo $b->year; ?></span>
                                                 </div>
                                                 </a>
                                             </div>
                                             <div class="title">
-                                                <a href="<?php echo route('blog_details',['id'=>''.$b->id.'']) ?>"><h2 class="h5"><?php echo $b->heading; ?></h2></a>
+                                                <a href="<?php echo route('blog_details',['id'=>''.$b->id.'']) ?>"><h2 class="h5" class="text-dark"><?php echo $b->heading; ?></h2></a>
                                             </div>
                                         </div>
                                 </article>

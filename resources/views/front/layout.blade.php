@@ -84,6 +84,18 @@
 
     <style>
 
+        .navbar-dropdown .box ul {
+                padding-left: 0;
+                list-style: none;
+            }
+
+            .navbar-dropdown .box ul li a {
+                display: block;
+                padding: 6px 12px;
+                color: #333;
+                font-size: 14px;
+            }
+
 
 
         .grid {
@@ -376,158 +388,90 @@
 
 
                     <div class="floating-menu">
-
                         <div class="close-menu-wrapper">
-
                             <span class="close-menu"><i class="icon icon-cross"></i></span>
-
                         </div>
 
                         <ul>
-
-                            
-
-                        <li>
-
-                                    <a href="#">Development & IT <span class="open-dropdown"></span></a>
-
-                                    <?php 
-
-                                    foreach($higher_professional as $hp) {
-
-                                            $urll = route('dev_details',['id'=>''.$hp->id.'']);
-
-                                    ?>
-
-                                            <div class="navbar-dropdown navbar-dropdown-single">
-
-                                                <div class="navbar-box">
-
-                                                    <div class="box-full">
-
-                                                        <div class="box clearfix">
-
-                                                            <ul>
-
-                                                                <?php 
-
-                                                                foreach($higher_professional as $hp) {
-
-                                                                        $urll = route('dev_details',['id'=>''.$hp->id.'']); ?>
-
-                                                                        <li><a href="<?php echo $urll; ?>"><?php echo $hp->heading; ?></a></li>
-
-                                                                        
-
-                                                                <?php } ?> 
-
-                                                                
-
-                                                            </ul>
-
-                                                        </div>
-
+                            {{-- Development & IT --}}
+                            <li>
+                                <a href="#">Development & IT <span class="open-dropdown"></span></a>
+                                @if(count($higher_professional) > 0)
+                                <div class="navbar-dropdown navbar-dropdown-single">
+                                    <div class="navbar-box">
+                                        <div class="box-full">
+                                            <div class="box clearfix row">
+                                                @php
+                                                    $chunks = $higher_professional->chunk(ceil(count($higher_professional) / 2));
+                                                @endphp
+                                                @foreach($chunks as $chunk)
+                                                    <div class="col-md-6">
+                                                        <ul>
+                                                            @foreach($chunk as $hp)
+                                                                <li><a href="{{ route('dev_details', ['id' => $hp->id]) }}">{{ $hp->heading }}</a></li>
+                                                            @endforeach
+                                                        </ul>
                                                     </div>
-
-                                                </div>
-
+                                                @endforeach
                                             </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
+                            </li>
 
-                                    <?php } ?>                
-
-                        </li>
-
-                        
-
-                        <?php 
-
-                            foreach($category as $d) {
-
-                                $url = route('product',['id'=>''.$d->id.'']); ?>
-
+                            {{-- Category + Subcategory --}}
+                            @foreach($category as $d)
+                                @php $url = route('product', ['id' => $d->id]); @endphp
                                 <li>
+                                    <a href="{{ $url }}">{{ $d->name }} <span class="open-dropdown"></span></a>
 
-                                    <a href="<?php echo $url; ?>"><?php echo $d->name; ?> <span class="open-dropdown"></span></a>
+                                    @php
+                                        $subcats = $subcategorys->filter(function ($sc) use ($d) {
+                                            return $sc->category_id === $d->id;
+                                        });
+                                    @endphp
 
-                                    <?php 
+                                    @if($subcats->count())
+                                    <div class="navbar-dropdown navbar-dropdown-single">
+                                        <div class="navbar-box">
+                                            <div class="box-full">
+                                                <div class="box clearfix row">
+                                                    @php
+                                                        $subChunks = $subcats->chunk(ceil($subcats->count() / 2));
+                                                    @endphp
 
-                                    foreach($subcategorys as $scate) { 
-
-                                        if($d->id === $scate->category_id) { 
-
-                                            $urll = route('subproduct',['id'=>''.$scate->id.'']); ?>
-
-                                            <div class="navbar-dropdown navbar-dropdown-single">
-
-                                                <div class="navbar-box">
-
-                                                    <div class="box-full">
-
-                                                        <div class="box clearfix">
-
+                                                    @foreach($subChunks as $chunk)
+                                                        <div class="col-md-6">
                                                             <ul>
-
-                                                                <?php 
-
-                                                                foreach($subcategorys as $scate) { 
-
-                                                                    if($d->id === $scate->category_id) { 
-
-                                                                        $urll = route('subproduct',['id'=>''.$scate->id.'']); ?>
-
-                                                                        <li><a href="<?php echo $urll; ?>"><?php echo $scate->name; ?></a></li>
-
-                                                                        
-
-                                                                <?php }
-
-                                                                } ?> 
-
-                                                                <li><a href="<?php echo $url; ?>">All <?php echo $d->name; ?> <i class="icon icon-arrow-right"></i></a></li>
-
+                                                                @foreach($chunk as $scate)
+                                                                    <li><a href="{{ route('subproduct', ['id' => $scate->id]) }}">{{ $scate->name }}</a></li>
+                                                                @endforeach
                                                             </ul>
-
                                                         </div>
+                                                    @endforeach
 
+                                                    <div class="col-md-12">
+                                                        <ul>
+                                                            <li><a href="{{ $url }}">All {{ $d->name }} <i class="icon icon-arrow-right"></i></a></li>
+                                                        </ul>
                                                     </div>
-
                                                 </div>
-
                                             </div>
-
-                                    <?php }
-
-                                    } ?>                
-
+                                        </div>
+                                    </div>
+                                    @endif
                                 </li>
+                            @endforeach
 
-
-
-
-
-                        <?php } ?>
-
-      
-
-                        <li><a href="{{ route('aboutus') }}">About Company</a></li>
-
-
-
-                        <li><a href="{{route('higher_professional')}}" class="menures" style="font-size: 13px;">Hire Now</a></li>
-
-
-
-                        <li><a href="javascript:void(0);" class="menures" data-toggle="modal" data-target="#myModal1">Get Free Consultation</a></li>
-
-                       
-
-                        <li><a href="{{route('developer_registration')}}" class="menures">Login Resource</a></li>
-
-                      
-
+                            {{-- Static Links --}}
+                            <li><a href="{{ route('aboutus') }}">About Company</a></li>
+                            <li><a href="{{ route('higher_professional') }}" class="menures" style="font-size: 13px;">Hire Now</a></li>
+                            <li><a href="javascript:void(0);" class="menures" data-toggle="modal" data-target="#myModal1">Get Free Consultation</a></li>
+                            <li><a href="{{ route('developer_registration') }}" class="menures">Login Resource</a></li>
                         </ul>
-
                     </div>
+
 
                 </div>
 

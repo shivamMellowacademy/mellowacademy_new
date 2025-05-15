@@ -1,176 +1,160 @@
 @extends('front.layout')
 @section('content')
 
-<br>
+<section class="py-5 bg-light">
+  <div class="container">
+    <?php foreach($about as $a) { ?>  
+      <h1 class="display-4 text-center mb-4"><?php echo $a->heading; ?></h1>
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <p class="lead text-center text-muted"><?php echo $a->description; ?></p>
+        </div>
+      </div>
+    <?php } ?>
+  </div>
+</section>
 
-<section class="about">
-  <header>
-    <div class="container">
-      <?php
-          foreach($about as $a) { ?>  
-      <h2 class="title"><?php echo $a->heading; ?></h2>
-      <?php } ?>
-      <div class="text-dark">
-        <?php
-          foreach($about as $a) { ?>
-            <p><?php echo $a->description; ?></p>
-        <?php } ?>
+<?php foreach($about as $aa) { ?>
+<section class="py-0">
+  <div class="container-fluid px-0">
+    <div class="about-image-container" style="height: 500px; overflow: hidden;">
+      <img src="<?php echo URL::asset('public/upload/about/'.$aa->image.'') ?>" alt="About us" class="img-fluid w-100 h-100" style="object-fit: cover;">
+    </div>
+  </div>
+</section>
+<?php } ?>
+
+<section class="py-5 bg-white">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="display-4">Meet The Team</h2>
+      <p class="lead text-muted">Hire High-Performance Individuals, On Your Terms</p>
+    </div>
+
+    <!-- Team Members -->
+    <div class="row">
+      <!-- CEO -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="row no-gutters h-100">
+            <div class="col-md-5">
+              <div class="team-img-container h-100">
+                <img src="{{ URL::asset('public/upload/team/nikhil.jpeg') }}" class="img-fluid h-100 w-100" alt="Nikhil Kothari" style="object-fit: cover;">
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="card-body d-flex flex-column h-100">
+                <h5 class="card-title text-primary">Nikhil Kothari</h5>
+                <h6 class="text-muted mb-3">Chief Executive Officer</h6>
+                <p class="card-text small text-dark">Throw him a curve ball and see his ideas thrive in action. Nikhil is unrelenting in breaking down complex issues to their last thread. He brings an interdisciplinary approach with an experience of over 12 years...</p>
+                <a href="#" class="btn btn-sm btn-outline-primary mt-auto align-self-start">Read More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTO -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="row no-gutters h-100">
+            <div class="col-md-5 order-md-2">
+              <div class="team-img-container h-100">
+                <img src="{{ URL::asset('public/upload/team/vixcy.jpg') }}" class="img-fluid h-100 w-100" alt="Vikash Kumar Pandit" style="object-fit: cover;">
+              </div>
+            </div>
+            <div class="col-md-7 order-md-1">
+              <div class="card-body d-flex flex-column h-100">
+                <h5 class="card-title text-primary">Vikash Kumar Pandit</h5>
+                <h6 class="text-muted mb-3">Chief Technology Officer</h6>
+                <p class="card-text small text-dark">Vikash knows the tactic to fix all. He is a doer and has rich experience of working with one of the tech giants in the country. He has delivered 100+ international projects...</p>
+                <a href="#" class="btn btn-sm btn-outline-primary mt-auto align-self-start">Read More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CFO -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="row no-gutters h-100">
+            <div class="col-md-5">
+              <div class="team-img-container h-100">
+                <img src="{{ URL::asset('public/upload/team/Sumit Photo 1.jpg') }}" class="img-fluid h-100 w-100" alt="Sumit Kumar Gugari" style="object-fit: cover;">
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="card-body d-flex flex-column h-100">
+                <h5 class="card-title text-primary">Sumit Kumar Gugari</h5>
+                <h6 class="text-muted mb-3">Chief Financial Officer</h6>
+                <p class="card-text small text-dark">Sumit truly knows how to lead from the front with his 18+ years of leadership experience with corporate giants such as TransUnion CIBIL, HSBC, JP Morgan, Nomura...</p>
+                <a href="#" class="btn btn-sm btn-outline-primary mt-auto align-self-start">Read More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CMO -->
+      <div class="col-lg-6 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="row no-gutters h-100">
+            <div class="col-md-5 order-md-2">
+              <div class="team-img-container h-100">
+                <img src="{{ URL::asset('public/upload/team/ashis.jpg') }}" class="img-fluid h-100 w-100" alt="Ashish Kumar Jain" style="object-fit: cover;">
+              </div>
+            </div>
+            <div class="col-md-7 order-md-1">
+              <div class="card-body d-flex flex-column h-100">
+                <h5 class="card-title text-primary">Ashish Kumar Jain</h5>
+                <h6 class="text-muted mb-3">Chief Marketing Officer</h6>
+                <p class="card-text small text-dark">Ashish is a digital marketing and cryptocurrency expert. His market knowledge of about 13 years in digital marketing and over 5 years in dealing with crypto space...</p>
+                <a href="#" class="btn btn-sm btn-outline-primary mt-auto align-self-start">Read More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLO -->
+      <div class="col-lg-6 mb-4 mx-auto">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="row no-gutters h-100">
+            <div class="col-md-5">
+              <div class="team-img-container h-100">
+                <img src="{{ URL::asset('public/upload/team/sanjay.jpg') }}" class="img-fluid h-100 w-100" alt="Sanjay Sonkar" style="object-fit: cover;">
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="card-body d-flex flex-column h-100">
+                <h5 class="card-title text-primary">Sanjay Sonkar</h5>
+                <h6 class="text-muted mb-3">Chief Legal Officer</h6>
+                <p class="card-text small text-dark">A seasoned practitioner Sanjay has multidimensional knowledge of corporate sector and is well skilled in drafting and pleading all kinds of litigations and proceeding...</p>
+                <a href="#" class="btn btn-sm btn-outline-primary mt-auto align-self-start">Read More</a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </header>
-  <div class="container-fluid">
-    <div class="image">
-      <?php
-          foreach($about as $aa) { ?>
-          <img src="<?php echo URL::asset('public/upload/about/'.$aa->image.'') ?>" alt="Alternate Text" />
-      <?php } ?>
-    </div>
   </div>
 </section>
 
+<style>
+  .team-img-container {
+    overflow: hidden;
+  }
+  
+  .about-image-container {
+    background-color: #f8f9fa; /* Fallback color if image doesn't load */
+  }
+  
+  @media (max-width: 767.98px) {
+    .team-img-container {
+      height: 250px !important;
+    }
+  }
+</style>
 
-<section id="blog">
-  <center>
-        <header class="blog_header">
-            <div class="container">
-                <h2 class="h2 title text-dark">MEET THE TEAM</h2>
-                <div class="text">
-                    <p class="text-dark">Hire High-Performance Individual/Team, On Your Terms</p>
-                </div>
-            </div>
-        </header>
-  </center>
-  <br>
-  <div class="blog-box">
-    <div class="blog-image">
-      <img src="{{ URL::asset('public/upload/team/nikhil.jpeg') }}" alt="Blog">
-    </div>
-    <div class="blog-details">
-      <h4 class="text-dark">MEET THE CEO</h4>
-      <p class="text-dark">THROW HIM A CURVE BALL AND SEE HIS IDEAS
-            THRIVE IN ACTION. NIKHIL IS UNRELENTING IN
-            BREAKING DOWN COMPLEX ISSUES TO THEIR LAST
-            THREAD. HE BRINGS AN INTERDISCIPLINARY
-            APPROACH WITH AN EXPERIENCE OF OVER 12
-            YEARS. HIS EXPERTISE LIES IN MARKETING, SALES,
-            EVENT MANAGEMENT AND CRISIS MANAGEMENT.
-            FROM IPL INAUGURAL CEREMONIES TO ISL
-            INAUGURAL CEREMONIES, CONCERTS TO SOCIAL
-            EVENTS, NIKHIL HAS SPEARHEADED ALL OF THEM.
-            HE IS AN AVID OBSERVER, SPORTS ENTHUSIAST
-            AND AN NCC CADET WHO BELIEVES THAT
-            TECHNOLOGY HAS THE POWER TO TRANSFORM
-            LIVES. OVER TIME HE HAS PLAYED THE ROLE OF AN
-            ADVISOR AND MENTOR TO MANY NEW STARTUPS.
-            TRULY A LEADER AND AN EMPATHETIC TEAM
-            PLAYER</p>
-      <a href="#">Nikhil Kothari</a>
-    </div>
-    
-  </div>
-  <div class="blog-box text-dark">
-    <div class="blog-details text-dark">
-      <h4 class="text-dark">MEET THE CTO</h4>
-      <p class="text-dark">VIKASH KNOWS THE TACTIC TO FIX ALL. HE IS
-        A DOER AND HAS RICH EXPERIENCE OF
-        WORKING WITH ONE OF THE TECH GIANTS IN
-        THE COUNTRY. HE HAS DELIVERED 100+
-        INTERNATIONAL PROJECTS. HIS
-        ENTREPRENEURIAL SPIRIT LED HIM TO BEGIN
-        HIS TWO ENTERPRISES: 1. GATEPASS
-        ONEYOUR'S NEW IDENTITY (IN PUNE) AND OF
-        COURSE THE SEMINATOR INFOSYSTEM. HIS
-        INTEREST LIES IN R&D ON NEW IDEA
-        IMPLEMENTATION AND REAL-TIME CASE
-        SOLVING. DON’T MISJUDGE HIM TO BE A TECHGEEK AS HE HAS ALSO ORGANISED LARGE
-        SCALE HAPPENING EVENTS IN THE PAST AS
-        WELL.</p>
-      <a href="#" class="text-dark">Vikash Kumar Pandit</a>
-    </div>
-    <div class="blog-image">
-      <img src="{{ URL::asset('public/upload/team/vixcy.jpg') }}" alt="Blog">
-    </div>
-    
-  </div>
-  <div class="blog-box">
-    <div class="blog-image">
-      <img src="{{ URL::asset('public/upload/team/Sumit Photo 1.jpg') }}" alt="Blog">
-    </div>
-    <div class="blog-details text-dark">
-      <h4 class="text-dark">MEET THE CFO</h4>
-      <p class="text-dark"> SUMIT TRULY KNOWS HOW TO LEAD FROM THE
-            FRONT WITH HIS 18+ YEARS OF LEADERSHIP
-            EXPERIENCE WITH CORPORATE GIANTS SUCH AS
-            TRANSUNION CIBIL, HSBC, JP MORGAN, NOMURA,
-            LEHMAN BROTHERS & CCIL. HE IS AN ADVISOR TO
-            MULTIPLE CONSULTING COMPANIES IN INDIA AND
-            ABROAD. HE HAS COMBINED HIS PASSION FOR
-            SPORTS AND ADVISORY BY PROVIDING
-            CONSULTATIONS TO CCUSA (CRICKET COUNCIL
-            USA), SMRI, SPORTSCASTER MANAGEMENT ETC.
-            HE IS ALSO THE CHAPTER PRESIDENT FOR MUMBAI
-            REGION FOR GOVERNMENT BLOCKCHAIN
-            ASSOCIATION (GBA), VIRGINIA, USA. AS A
-            BLOCKCHAIN EVANGELIST, BPM EXPERT AND
-            DESIGN THINKING PRACTITIONER, SUMIT AIMS TO
-            REVOLUTIONIZE THE BLOCKCHAIN AND CRYPTO
-            SPACE WITH HIS DYNAMIC LEADERSHIP
-            EXPERIENCE, POWERING INNOVATION.</p>
-      <a href="#" >Sumit Kumar Gugari</a>
-    </div>
-  </div>
-  <div class="blog-box">
-    <div class="blog-details text-dark">
-      <h4 class="text-dark">MEET THE CMO</h4>
-      <p class="text-dark">ASHISH IS A DIGITAL MARKETING AND
-            CRYPTOCURRENCY EXPERT. HIS MARKET
-            KNOWLEDGE OF ABOUT 13 YEARS IN DIGITAL
-            MARKETING AND OVER 5 YEARS IN DEALING
-            WITH CRYPTO SPACE HAS GIVEN HIM A
-            PROFOUND EXPERTISE. HE HAS A STRONG
-            HOLD ON SEO, SEM, SMO, PPC ADVERT AND
-            OTHER AREAS OF EXPERTISE IN DIGITAL
-            MARKETING. HE ALSO HAS A THOROUGH
-            UNDERSTANDING OF ADVISORS, INVESTORS,
-            COMMUNITY MANAGEMENT, DIGITAL
-            SUPPORT, PROJECT PLANNING, BASICALLY
-            THE ENTIRE ECOSYSTEM TO SUPPORT TOKEN/
-            COIN IN CRYPTO REALM. IN SHORT OUR
-            DIGITAL MARKETING GENIUS.</p>
-      <a href="#" class="text-dark">Ashish Kumar Jain</a>
-    </div>
-    <div class="blog-image">
-      <img src="{{ URL::asset('public/upload/team/ashis.jpg') }}" alt="Blog">
-    </div>
-  </div>
-  <div class="blog-box">
-    <div class="blog-image">
-      <img src="{{ URL::asset('public/upload/team/sanjay.jpg') }}" alt="Blog">
-    </div>
-    <div class="blog-details" class="text-dark">
-      <h4 class="text-dark">MEET THE CLO</h4>
-      <p class="text-dark"> A SEASONED PRACTITIONER SANJAY HAS
-            MULTIDIMENSIONAL KNOWLEDGE OF
-            CORPORATE SECTOR AND IS WELL SKILLED
-            IN DRAFTING AND PLEADING ALL KINDS OF
-            LITIGATIONS AND PROCEEDING IN ALL
-            LEVELS OF COURT RANGING FROM HIGH
-            COURT OF CALCUTTA TO APEX COURT. HE
-            HAS A CHARISMATIC PERSONALITY WITH A
-            POSITIVE ATTITUDE. HE HAS BEEN
-            ASSOCIATED WITH A NUMBER OF REPUTED
-            LAW FIRMS AND CORPORATE HOUSES AS
-            THEIR LEGAL ADVISOR FOR THE LAST FEW
-            YEARS. CURRENTLY SERVING AS AN
-            ARBITRATOR AT VARIOUS PRIVATE AND
-            PUBLIC ARBITRATION PROCEEDINGS. WALL
-            OF OUR COMPANY WE CALL HIM MR.
-            DEPENDABLE</p>
-      <a href="#" class="text-dark">Sanjay Sonkar</a>
-    </div>
-  </div>
-</section>
-          
 @endsection
-
-

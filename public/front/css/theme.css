@@ -1336,7 +1336,7 @@ nav .navigation-main .navbar-dropdown .navbar-box ul > li:last-child > a {
         width: auto;
         right: auto;
         left: auto;
-        max-width: 250px;
+        max-width: 480px;
     }
     nav .navigation-main .floating-menu > ul > li .navbar-dropdown.navbar-dropdown-single .navbar-box {
         min-height: inherit;
@@ -8816,7 +8816,8 @@ button {
   text-shadow: 0 1px rgba(128, 128, 128, 0.75);
 }
 button:hover {
-  background-color: #85ddbf;
+  background-color: #00264d;
+  color: #fff !important;
 }
 
 .form-control.form-quantity {
