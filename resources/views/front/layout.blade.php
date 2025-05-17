@@ -84,6 +84,9 @@
 
     <style>
 
+        a:not([href]):not([tabindex]) {
+                color: #000 !important;
+            }
         .navbar-dropdown .box ul {
                 padding-left: 0;
                 list-style: none;

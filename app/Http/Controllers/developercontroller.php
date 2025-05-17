@@ -90,10 +90,10 @@ class developercontroller extends Controller
                 {
                     session(['message' =>'success', 'errmsg' =>'Registration Complete']);
 
-                        Mail::send('registration_mail', $datas, function($message) use ($emails) {
-                        $message->to($emails)->subject('Mellow Elements');
-                        $message->from('dev@mellowelements.in', 'Mellow Elements');
-                    });
+                        // Mail::send('registration_mail', $datas, function($message) use ($emails) {
+                        // $message->to($emails)->subject('Mellow Elements');
+                        // $message->from('dev@mellowelements.in', 'Mellow Elements');
+                    // });
 
                      return view('developer/index');
                 }

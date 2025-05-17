@@ -1,46 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Responsive Admin Dashboard Template">
-    <meta name="keywords" content="admin,dashboard">
-    <meta name="author" content="stacks">
-    <title>Please Login Here - Mellow Vault</title>
-
+    <title>Reset Password | Mellow Vault</title>
+    
+    <!-- Favicon -->
     <link rel="icon" href="{{ URL::asset('public/front/assets/images/Logo-01.png') }}">
-
-    <!-- Styles -->
-    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- CSS -->
     <link href="{{ URL::asset('public/developer/assets/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ URL::asset('public/developer/assets/plugins/font-awesome/css/all.min.css') }}" rel="stylesheet">
-    <link href="{{ URL::asset('public/developer/assets/css/connect.min.css') }}" rel="stylesheet">
-    <link href="{{ URL::asset('public/developer/assets/css/admin2.css') }}" rel="stylesheet">
-    <link href="{{ URL::asset('public/developer/assets/css/dark_theme.css') }}" rel="stylesheet">
-    <link href="{{ URL::asset('public/developer/assets/css/custom.css') }}" rel="stylesheet">
+    <link href="{{asset('public/asset/css/style.css')}}" rel="stylesheet">
 
-    <style>
-    .loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(255, 255, 255, 0.7);
-        z-index: 9999;
-        display: none;
-        justify-content: center;
-        align-items: center;
-    }
-    </style>
+
 </head>
 
-<body class="auth-page sign-in">
-
+<body class="auth-page">
     <!-- Loader -->
     <div class='loader'>
         <div class='spinner-border text-primary' role='status'>
@@ -48,65 +28,112 @@
         </div>
     </div>
 
-    <div class="connect-container align-content-stretch d-flex flex-wrap">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-5">
-                    <div class="auth-form">
-                        <div class="row">
-                            <div class="col">
-                                <div class="row">
-                                    <div class="col-lg-8 ml-auto mr-auto">
-                                        @if(session('success'))
-                                        <div id="flash-message"
-                                            class="alert alert-success alert-dismissible fade show position-fixed"
-                                            style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
-                                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                            <strong>{{ session('success') }}</strong>
-                                        </div>
-                                        @endif
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            <div class="row no-gutters">
+                <!-- Form Section -->
+                <div class="col-lg-6">
+                    <div class="auth-form-side">
+                         @if(session('success'))
+                            <div class="alert alert-success alert-flash">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>{{ session('success') }}</strong>
+                            </div>
+                        @endif
 
-                                        @if(session('error'))
-                                        <div id="flash-message"
-                                            class="alert alert-danger alert-dismissible fade show position-fixed"
-                                            style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
-                                            <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                            <strong>{{ session('error') }}</strong>
-                                        </div>
-                                        @endif
-                                    </div>
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-flash">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>{{ session('error') }}</strong>
+                            </div>
+                        @endif
+                        
+                        <!-- Logo -->
+                        <div class="logo-box">
+                            <a href="{{ url('/') }}">
+                                <img src="{{ URL::asset('public/front/assets/images/Logo-01.png') }}" alt="Mellow Vault">
+                            </a>
+                        </div>
+                        
+                        <h1 class="form-title auth-heading">Reset Password</h1>
+                        <p class="form-description">Enter your email to receive a password reset link</p>
+                        
+                        <!-- Flash Messages -->
+                        @if(session('success'))
+                            <div class="alert alert-success alert-flash">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>{{ session('success') }}</strong>
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-flash">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <strong>{{ session('error') }}</strong>
+                            </div>
+                        @endif
+                        
+                        <!-- Reset Form -->
+                        <form id="forgot-password-form" method="post" action="{{ route('password.email') }}">
+                            @csrf
+                            
+                            <div class="form-group">
+                                <input type="email" class="form-control" name="email" id="email" 
+                                    placeholder="Email Address *" required>
+                                <strong id="email-error" class="text-danger d-block mt-1"></strong>
+                            </div>
+                            
+                            
+                            <button type="submit" class="btn btn-primary btn-block btn-submit" id="submitBtn">
+                                <span class="btn-text">Send Reset Link</span>
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                            
+                            <div class="form-footer">
+                                Remember your password? <a href="{{ route('developer_admin') }}">Sign In</a>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Feature Section -->
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="auth-feature-side">
+                        <h2 class="feature-heading">Secure Your Account</h2>
+                        
+                        <div class="feature-list">
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fa fa-shield-alt"></i>
                                 </div>
-
-                                <div class="logo-box text-center">
-                                    <a href="{{ url('/') }}" class="logo-text">
-                                        <img src="{{ URL::asset('public/front/assets/images/Logo-01.png') }}" alt=""
-                                            width="150" height="95" />
-                                    </a>
+                                <div class="feature-content">
+                                    <h4>Account Security</h4>
+                                    <p class="text-white">We prioritize the security of your account and personal information.</p>
                                 </div>
-
-                                <form id="forgot-password-form" method="post" action="{{ route('password.email') }}">
-                                    @csrf
-                                    <div class="form-group">
-                                        <input type="email" class="form-control" name="email" id="email"
-                                            placeholder="Email Address *">
-                                        <strong id="email-error" class="text-danger d-block mt-1"></strong>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-block btn-submit" id="submitBtn">
-                                        <span class="btn-text">Send Password Reset Link</span>
-                                        <span class="spinner-border spinner-border-sm d-none" role="status"
-                                            aria-hidden="true"></span>
-                                    </button>
-
-                                    <a href="{{ route('developer_admin') }}"><span>Sign In</span></a>
-                                </form>
-
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fa fa-envelope"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Instant Delivery</h4>
+                                    <p class="text-white">Password reset links are sent immediately to your registered email.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="feature-item">
+                                <div class="feature-icon">
+                                    <i class="fa fa-lock"></i>
+                                </div>
+                                <div class="feature-content">
+                                    <h4>Secure Process</h4>
+                                    <p class="text-white">Our password reset process uses industry-standard encryption.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-lg-6 d-none d-lg-block d-xl-block">
-                    <div class="auth-image"></div>
                 </div>
             </div>
         </div>
@@ -116,11 +143,7 @@
     <script src="{{ URL::asset('public/developer/assets/plugins/jquery/jquery-3.4.1.min.js') }}"></script>
     <script src="{{ URL::asset('public/developer/assets/plugins/bootstrap/popper.min.js') }}"></script>
     <script src="{{ URL::asset('public/developer/assets/plugins/bootstrap/js/bootstrap.min.js') }}"></script>
-    <script src="{{ URL::asset('public/developer/assets/plugins/jquery-slimscroll/jquery.slimscroll.min.js') }}">
-    </script>
-    <script src="{{ URL::asset('public/developer/assets/js/connect.min.js') }}"></script>
 
-    <!-- AJAX and Flash -->
     <script>
     $(document).ready(function() {
         $('#forgot-password-form').on('submit', function(e) {
@@ -129,11 +152,14 @@
             let token = $('input[name="_token"]').val();
             let emailError = $('#email-error');
             let submitBtn = $('#submitBtn');
+            
+            // Reset errors
             emailError.text('');
-            $('.loader').fadeIn(); // Show loader
+            $('.loader').fadeIn();
             submitBtn.prop('disabled', true);
             submitBtn.find('.btn-text').text('Sending...');
             submitBtn.find('.spinner-border').removeClass('d-none');
+            
             $.ajax({
                 url: "{{ route('password.email') }}",
                 type: "POST",
@@ -144,20 +170,22 @@
                 success: function(response) {
                     $('.loader').fadeOut();
                     submitBtn.prop('disabled', false);
-                    submitBtn.find('.btn-text').text('Send Password Reset Link');
+                    submitBtn.find('.btn-text').text('Send Reset Link');
                     submitBtn.find('.spinner-border').addClass('d-none');
-
-
-                    showFlash('success', response.message ||
-                        'A password reset link has been sent.');
+                    
+                    // Show success message
+                    showFlash('success', response.message || 
+                        'Password reset link has been sent to your email.');
+                    
+                    // Clear form
                     $('#forgot-password-form')[0].reset();
                 },
                 error: function(xhr) {
                     $('.loader').fadeOut();
                     submitBtn.prop('disabled', false);
-                    submitBtn.find('.btn-text').text('Send Password Reset Link');
+                    submitBtn.find('.btn-text').text('Send Reset Link');
                     submitBtn.find('.spinner-border').addClass('d-none');
-
+                    
                     if (xhr.status === 422 && xhr.responseJSON.errors.email) {
                         emailError.text(xhr.responseJSON.errors.email[0]);
                     } else if (xhr.responseJSON && xhr.responseJSON.message) {
@@ -166,29 +194,24 @@
                 }
             });
         });
-
+        
         function showFlash(type, message) {
-            let alertType = type === 'success' ? 'alert-success' : 'alert-danger';
+            let alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
             let flashHtml = `
-        <div id="flash-message"
-            class="alert ${alertType} alert-dismissible fade show position-fixed"
-            style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <strong>${message}</strong>
-        </div>`;
-
+                <div class="alert ${alertClass} alert-flash">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>${message}</strong>
+                </div>
+            `;
+            
             $('body').append(flashHtml);
-
+            
+            // Auto remove after 5 seconds
             setTimeout(() => {
-                $('#flash-message').fadeOut('slow', function() {
-                    $(this).remove();
-                });
-            }, 7000);
+                $('.alert-flash').remove();
+            }, 5000);
         }
-
     });
     </script>
-
 </body>
-
 </html>
