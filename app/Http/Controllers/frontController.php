@@ -26,13 +26,13 @@ class frontController extends Controller
     {  
         
         $show['pro'] = DB::table('product_tb')->selectRaw('c_id, count(id) as count_id')->groupBy('c_id')->get();
-        $show['allproduct'] = DB::table('product_tb')->orderby('id','desc')->limit(3)->get(); 
+        $show['allproduct'] = DB::table('product_tb')->orderby('id','desc')->paginate(4); 
         $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
         $show['about'] = DB::table('about_tb')->orderby('id','desc')->get(); 
     	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
         $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
         $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
-        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->paginate(8);
 
         $show['web_details'] = DB::table('web_setting')->get();
 
@@ -76,7 +76,8 @@ class frontController extends Controller
 		$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
         $show['about'] = DB::table('about_tb')->orderby('id','desc')->get();
         $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
-        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+       $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->paginate(5);
+
 
         $show['web_details'] = DB::table('web_setting')->get();
 

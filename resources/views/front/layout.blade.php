@@ -1301,12 +1301,9 @@
 }
 
 .section-title::after {
-    content: '';
     position: absolute;
-    left: 0;
     bottom: 0;
-    width: 40px;
-    height: 3px;
+    width: 100%;
     background: #3498db;
 }
 
