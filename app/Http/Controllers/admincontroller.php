@@ -1848,7 +1848,8 @@ public function update_developer_details(Request $request)
             'location_id' => 1,
             'application_sources' => 'addedByUser'
         ];
-        $response = Http::withoutVerifying()->post('https://gulbug.com/staging/mellow_backend/public/api/job-applications', $payload);
+        $url = env('URL').'/api/job-applications';
+        $response = Http::withoutVerifying()->post($url, $payload);
             
         $emails=array();
         

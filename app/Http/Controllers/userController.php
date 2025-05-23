@@ -18,9 +18,6 @@ use URL;
 
 class userController extends Controller
 {
-	private $razorpayId = "rzp_live_k8FyLiwKwfBx2j";
-    private $razorpayKey = "ltaegAk3x7CH3RPRhcs5eUDV";
-
     public function developer_order_data()
     { 
         $u_id=Session::get('user_login_id');  
@@ -83,7 +80,21 @@ class userController extends Controller
 
     public function submit_registeration(Request $request)
     {
-        $response = Http::withoutVerifying()->post('https://gulbug.com/staging/mellow_backend/public/api/employer-register', [
+        $request->validate([
+            'fname' => 'required',
+            'lname' => 'required',
+            'location' => 'required',
+            'email' => 'required|email',
+            'phone' => 'required|digits:10',
+            'password' => 'required|min:5',
+            'user_name' => 'required|min:5|max:255',
+            'company_name' => 'required',
+            'address' => 'required',
+            'purpose' => 'required',
+        ]);
+             
+		$url = env('URL').'api/employer-register';
+        $response = Http::withoutVerifying()->post($url, [
             'company_name' => $request->input('company_name'),
             'email' => $request->input('email'),
             'phone' => $request->input('phone'),
@@ -94,19 +105,6 @@ class userController extends Controller
         ]);
         
         $response->body();
-		
-        $email=$request->post('email');
-       // echo $email; exit();
-		request()->validate([
-		'fname' => 'required',
-		'lname' => 'required',
-		'location' => 'required',
-		'email' => 'required|email',
-		'phone' => 'required|digits:10',
-		'password' => 'required|min:5',
-		'user_name' => 'required|min:5|max:255',
-	
-		]);
              
 			$email=$request->post('email');
 		
@@ -152,7 +150,7 @@ class userController extends Controller
 	            
 	            $files = [
                     public_path('front/assets/images/Logo-01.png'),
-                    URL::$link,
+                    // URL::$link,
                 ];
                 
 
@@ -302,9 +300,12 @@ class userController extends Controller
 	{
 		// Validate input
 		$request->validate([
-			'phone' => 'required',
-			'password' => 'required'
-		]);
+            'email_login' => 'required',
+            'password_login' => 'required'
+        ]);
+
+        $phone = $request->post('email_login');
+        $pass = $request->post('password_login');
 
 		$show['developer_order_details'] = $this->developer_order_data();
 		$show['user_details'] = DB::table('user_login')->orderBy('id', 'desc')->get(); 
@@ -320,9 +321,7 @@ class userController extends Controller
 		$show['developer_cart_empty'] = DB::table('developer_cart_tb')->whereNull('status')->where('u_id', $u_id)->count();
 		$show['developer_cart_value'] = DB::table('developer_cart_tb')->whereNull('status')->where('u_id', $u_id)->count();
 
-		$phone = $request->post('phone');
-		$pass = $request->post('password');
-
+		
 		// Find user by email or phone
 		$loginUser = DB::table('user_login')
 			->where(function ($query) use ($phone) {

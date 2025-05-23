@@ -344,10 +344,10 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa fa-user"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" name="phone" placeholder="Email or Phone" value="{{ old('phone') }}">
+                                            <input type="text" class="form-control" name="email_login" placeholder="Email" value="{{ old('email_login') }}">
                                         </div>
-                                        @if ($errors->has('phone'))
-                                            <small class="text-danger">{{ $errors->first('phone') }}</small>
+                                        @if ($errors->has('email_login'))
+                                            <small class="text-danger">{{ $errors->first('email_login') }}</small>
                                         @endif
                                     </div>
 
@@ -356,15 +356,15 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa fa-lock"></i></span>
                                             </div>
-                                            <input type="password" class="form-control" name="password" id="loginPassword" placeholder="Password">
+                                            <input type="password" class="form-control" name="password_login" id="loginPassword" placeholder="password_login">
                                             <div class="input-group-append">
                                                 <button class="btn btn-outline-secondary toggle-password" type="button">
                                                     <i class="fa fa-eye"></i>
                                                 </button>
                                             </div>
                                         </div>
-                                        @if ($errors->has('password'))
-                                            <small class="text-danger">{{ $errors->first('password') }}</small>
+                                        @if ($errors->has('password_login'))
+                                            <small class="text-danger">{{ $errors->first('password_login') }}</small>
                                         @endif
                                     </div>
 
@@ -467,10 +467,7 @@ $(document).ready(function() {
         $('#register').addClass('show active');
     });
 
-    // Phone number validation
-    $('input[name="phone"]').on('input', function() {
-        this.value = this.value.replace(/\D/g, '').slice(0, 10);
-    });
+    
 });
 </script>
 

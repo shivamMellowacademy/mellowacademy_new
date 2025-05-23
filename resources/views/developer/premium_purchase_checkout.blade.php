@@ -277,14 +277,20 @@
                                                             
                                                             <tr>
                                                                 <td><b> Total Price : </b></td>
-                                                                <td><?php echo $total_price = $premium->offerprice + $calculate_price = (( 18 / 100 ) * $premium->offerprice ); ?> INR</td>
+                                                                
+                                                                @if(isset($premium))
+                                                                   <td><?php echo $total_price = $premium->offerprice + $calculate_price = (( 18 / 100 ) * $premium->offerprice ); ?> INR</td>
+                                                                @else
+                                                                    <!-- <td>{{$premium->price}}</td> -->
+                                                                    <td> N/A </td>
+                                                                @endif
                                                             </tr>
                                                             
                                                         </table>
                                                     </center>
                                                 </div>
                                                 
-                                                <?php session(['total_price' => $total_price]); ?>
+                                             
 
                                         </div>
                                         <div style="padding-top:20px">

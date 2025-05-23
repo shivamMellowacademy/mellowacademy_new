@@ -191,7 +191,7 @@
 
             <div class="container">
 
-                <a href="{{route('index')}}" class="logo">
+                <a href="{{url('/')}}" class="logo">
 
                     <?php 
 
@@ -213,7 +213,7 @@
 
                         <li class="left-side">
 
-                            <a href="{{route('index')}}" class="logo-icon">
+                            <a href="{{url('/')}}" class="logo-icon">
 
                                 <?php 
 
@@ -946,7 +946,7 @@
 
                                     <hr style="width:520px;">
 
-                                    <a class="btn btn-primary btn-lg" href="{{route('index')}}" role="button">CONTINUE SHOPPING</a> 
+                                    <a class="btn btn-primary btn-lg" href="{{url('/')}}" role="button">CONTINUE SHOPPING</a> 
 
                                 </center> 
 

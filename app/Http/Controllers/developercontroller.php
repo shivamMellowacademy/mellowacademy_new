@@ -657,13 +657,17 @@ class developercontroller extends Controller
 
         $show['resource_details'] = DB::table('developer_order_tb')->where('dev_id',$developer_id)->orderby('id','desc')->get();
         
-        $show['tax'] = DB::table('developer_premium_price_table')->first();
+        $taxRow = DB::table('developer_premium_price_table')->first();
+
+        $show['tax'] = $taxRow ?? (object) ['tax' => 0];
         
         $show['premium'] = Premium::all();
         
         $show['prices'] = developerPremiumPrice::where('status',true)->get();
         
         $show['date'] = developerPayments::where('developer_id', Session::get('developer_login_id'))->orderBy('id', 'DESC')->first();
+        
+        $show['developer_id'] = $developer_id;
 
         return view('developer/developer_premium')->with($show);
     }

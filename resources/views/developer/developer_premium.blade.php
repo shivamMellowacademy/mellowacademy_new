@@ -26,25 +26,13 @@
                     </ul>
                 </div>
                 @if(isset($date))
-                    @if($date->expired == null)
+                    @if($date->expired === null || $date->expired >= now())
+                        {{-- Show "Thank you" for active or one-time subscriptions --}}
                         <div class="text-right m-4">
                             <button type="button" class="btn btn-outline-primary ml-3">Thank you</button>
                         </div>
-                    @elseif($date->expired >= now())
-                        <div class="text-right m-4">
-                            <label for="planPay" class="mr-2 font-weight-bold">Choose Your Plan:</label>
-                            <select id="planPay" class="form-control d-inline w-auto">
-                                @foreach($prices as $val)
-                                    @if($date->developer_premium_prices_id != $val->id)
-                                        <option value="{{ $val->price }}" data-price="{{ $val->id }}">
-                                            {{ ucfirst($val->name) }} - ₹{{ number_format($val->price, 2) }}
-                                        </option>
-                                    @endif
-                                @endforeach
-                            </select>
-                            <button type="button" onclick="pay()" class="btn btn-outline-primary ml-3">Pay</button>
-                        </div>
                     @else
+                        {{-- Show payment options only if subscription expired --}}
                         <div class="text-right m-4">
                             <label for="planPay" class="mr-2 font-weight-bold">Choose Your Plan:</label>
                             <select id="planPay" class="form-control d-inline w-auto">
@@ -58,6 +46,7 @@
                         </div>
                     @endif
                 @else
+                    {{-- No subscription exists - show all payment options --}}
                     <div class="text-right m-4">
                         <label for="planPay" class="mr-2 font-weight-bold">Choose Your Plan:</label>
                         <select id="planPay" class="form-control d-inline w-auto">
@@ -74,25 +63,24 @@
         </div>
    	</div>
 </div>
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-    function pay()
-    {
-        let plan = parseInt($("#planPay").val());
-        let taxRate = {{ $tax->tax }}; // This is passed from Blade to JS
+    function pay() {
+        let planSelect = document.getElementById('planPay');
+        let plan = parseInt(planSelect.value);
+        let priceId = planSelect.options[planSelect.selectedIndex].dataset.price;
+        let taxRate = {{ $tax->tax }};
         let tax = plan * (taxRate / 100);
         let total = plan + tax;
+
         var options = {
             "key": "{{ env('RAZORPAY_KEY') }}",
-            "amount": total*100, // in paise
+            "amount": total*100,
             "currency": "INR",
             "name": "Mellow Academy",
             "description": "Test Transaction",
             "handler": function (response){
-                // AJAX call to confirm payment
-                
                 fetch("{{ route('developer_premium_pay') }}", {
                     method: "POST",
                     headers: {
@@ -103,26 +91,30 @@
                         razorpay_payment_id: response.razorpay_payment_id,
                         razorpay_order_id: response.razorpay_order_id,
                         razorpay_signature: response.razorpay_signature,
-                        razorpay_id: id,
+                        razorpay_id: priceId,
                     })
                 })
-                // .then(res => res.json())
-                .then(data => {
-                    alert("Payment Successful!");
-                    window.location.reload();
+                .then(async res => {
+                    try {
+                        const data = await res.json();
+                        if (!res.ok) {
+                            throw new Error(data.message || 'Payment failed');
+                        }
+                        alert('Payment successful!');
+                        window.location.reload();
+                    } catch (error) {
+                        alert(error.message);
+                        console.error(error);
+                    }
                 })
                 .catch(error => {
                     alert("Payment failed or couldn't be saved.");
                     console.error(error);
                 });
             },
-
         };
         var rzp = new Razorpay(options);
         rzp.open();
     }
-
-
-
 </script>
 @endsection

@@ -114,6 +114,10 @@
     .professional-card:hover .professional-image-wrapper img {
         transform: scale(1.08);
     }
+    .product-image {
+        width: 100% !important;
+        height: 100% !important;
+    }
     
     .professional-overlay {
         position: absolute;
@@ -434,7 +438,7 @@
         </div>
 
         <div class="row">
-            @forelse($higher_professional as $hp)
+            @forelse($higher_professional_show as $hp)
                 <div class="col-sm-6 col-md-4 col-lg-3">
                     <div class="professional-card">
                         <a href="{{ route('dev_details', $hp->id) }}" class="professional-image-link">
@@ -463,14 +467,14 @@
             @endforelse
         </div>
 
-        @if($higher_professional->hasPages())
+        @if($higher_professional_show->hasPages())
             <div class="d-flex justify-content-center mt-4">
-                {{ $higher_professional->links('pagination::bootstrap-4') }}
+                {{ $higher_professional_show->links('pagination::bootstrap-4') }}
             </div>
         @endif
         
         <div class="text-center mt-5">
-            <a href="#" class="btn btn-gradient px-4">
+            <a href="{{url('higher_professional')}}" class="btn btn-gradient px-4">
                 Browse All Professionals <i class="fa fa-arrow-right ml-2"></i>
             </a>
         </div>
@@ -551,11 +555,11 @@
                                 @if(empty($product->image))
                                     <div class="video-wrapper">
                                         <video class="product-video" controls controlsList="nodownload">
-                                            <source src="{{ asset('storage/videos/' . $product->video) }}" type="video/mp4">
+                                            <source src="{{ asset('public/upload//' . $product->video) }}" type="video/mp4">
                                         </video>
                                     </div>
                                 @else
-                                    <img src="{{ asset('storage/products/' . $product->image) }}" 
+                                    <img src="{{ asset('public/upload/product/' . $product->image) }}" 
                                          alt="{{ $product->name }}" 
                                          class="product-image">
                                 @endif
@@ -577,7 +581,7 @@
         </div>
 
         <div class="text-center mt-4">
-            <a href="#" class="btn btn-gradient px-4">
+            <a href="{{url('subproduct/16')}}" class="btn btn-gradient px-4">
                 View All Products <i class="fa fa-arrow-right ml-2"></i>
             </a>
         </div>
@@ -659,7 +663,7 @@
                 <p class="lead mb-0 text-white-50">Join thousands of companies who have hired top talent through our platform.</p>
             </div>
             <div class="col-lg-4 text-lg-right">
-                <a href="{{ route('contact') }}" class="btn btn-light btn-lg px-4">Get Started Now</a>
+                <a href="{{ route('registration') }}" class="btn btn-light btn-lg px-4">Get Started Now</a>
             </div>
         </div>
     </div>
@@ -712,7 +716,7 @@
         </div>
 
         <div class="text-center mt-4">
-            <a href="{{ route('contact') }}" class="btn btn-gradient px-4">
+            <a href="{{ route('registration') }}" class="btn btn-gradient px-4">
                 Become a Partner <i class="fa fa-arrow-right ml-2"></i>
             </a>
         </div>

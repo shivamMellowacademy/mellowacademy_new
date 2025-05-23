@@ -155,7 +155,7 @@
                         <!-- About Tab -->
                         <div class="tab-pane fade show active" id="about">
                             <div class="tab-section">
-                                <h3 class="section-title">About Me</h3>
+                                <h3 class="section-title text-dark">About Me</h3>
                                 @foreach($deve as $d)
                                 <div class="section-content">
                                     {!! $d->description !!}
@@ -167,7 +167,7 @@
                         <!-- Skills Tab -->
                         <div class="tab-pane fade" id="skills">
                             <div class="tab-section">
-                                <h3 class="section-title">Technical Skills</h3>
+                                <h3 class="section-title text-dark">Technical Skills</h3>
                                 @foreach($deve as $d)
                                 <div class="skills-container">
                                     @foreach(explode(',', $d->skills) as $skill)
@@ -181,7 +181,7 @@
                         <!-- Experience Tab -->
                         <div class="tab-pane fade" id="experience">
                             <div class="tab-section">
-                                <h3 class="section-title">Work Experience</h3>
+                                <h3 class="section-title text-dark">Work Experience</h3>
                                 @foreach($deve as $d)
                                 <div class="experience-list">
                                     {!! $d->completed_job !!}
@@ -215,7 +215,7 @@
                 @if(!empty($developer_project) && count($developer_project) > 0)
                 <!-- Portfolio Section -->
                 <div class="portfolio-section">
-                    <h3 class="section-title">Featured Projects </h3>
+                    <h3 class="section-title text-dark">Featured Projects </h3>
                     <div class="portfolio-grid">
                         @foreach($developer_project as $dd)
                         <div class="portfolio-item">

@@ -524,167 +524,239 @@
 <!-- Profile Detail Modal -->
 @foreach($details as $s)
 <div class="modal fade" id="profileModal{{ $s->dev_id }}" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-profile modal-dialog-centered" role="document">
-        <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
             <!-- Banner + Profile Header -->
-            <div class="profile-banner">
-                <img src="{{ asset('public/upload/developer/'.$s->image) }}" 
-                     class="profile-avatar" 
-                     alt="{{ $s->name }}">
-                <button type="button" class="btn btn-sm btn-icon position-absolute" 
-                        style="top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); color: white;" 
+            <div class="profile-header position-relative">
+                <!-- Cover Photo Placeholder -->
+                <div class="cover-photo" style="background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%); height: 120px;"></div>
+                
+                <!-- Profile Avatar -->
+                <div class="avatar-container text-center">
+                    <img src="{{ asset('public/upload/developer/'.$s->image) }}" 
+                         class="profile-avatar rounded-circle border-4 border-white shadow" 
+                         alt="{{ $s->name }}"
+                         onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode($s->name) }}+{{ urlencode($s->last_name) }}&background=random'">
+                </div>
+                
+                <!-- Close Button -->
+                <button type="button" class="btn btn-icon btn-light position-absolute rounded-circle shadow-sm" 
+                        style="top: 1rem; right: 1rem;" 
                         data-dismiss="modal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
             <!-- Body -->
-            <div class="modal-body pt-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="mb-1">{{ $s->name }} {{ $s->last_name }}</h4>
-                        <p class="text-muted mb-0">{{ $s->heading }}</p>
-                        <div class="d-flex align-items-center mt-2">
+            <div class="modal-body pt-5 px-4">
+                <!-- Profile Headline -->
+                <div class="profile-headline text-center mb-4">
+                    <h2 class="mb-1">{{ $s->name }} {{ $s->last_name }}</h2>
+                    <p class="text-muted mb-2">{{ $s->heading }}</p>
+                    
+                    <div class="d-flex justify-content-center align-items-center flex-wrap">
+                        <div class="d-flex align-items-center mx-2 mb-1">
                             <i class="fas fa-map-marker-alt mr-1 text-muted"></i>
-                            <small class="text-muted mr-3">{{ $s->address }}</small>
-                            <span class="rating-badge status-badge">
-                                <i class="fas fa-star mr-1"></i> {{ $s->rating }} Rating
-                            </span>
+                            <small class="text-muted">{{ $s->address }}</small>
                         </div>
-                    </div>
-                    <div>
-                        <span class="status-badge status-{{ $s->developer_status == 'Active' ? 'active' : 'inactive' }}">
+                        
+                        <div class="rating-badge bg-light-primary text-primary px-3 py-1 rounded-pill mx-2 mb-1">
+                            <i class="fas fa-star mr-1"></i> {{ $s->rating }} Rating
+                        </div>
+                        
+                        <div class="status-badge status-{{ $s->developer_status == 'Active' ? 'active' : 'inactive' }} mx-2 mb-1">
                             {{ $s->developer_status }}
-                        </span>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Nav Tabs -->
-                <ul class="nav nav-tabs profile-tabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#about{{ $s->dev_id }}">
-                            <i class="fas fa-user mr-1"></i> About
+                <ul class="nav nav-pills justify-content-center mb-4" role="tablist">
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active px-3 py-2" data-toggle="tab" href="#about{{ $s->dev_id }}">
+                            <i class="fas fa-user mr-2"></i> About
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#skills{{ $s->dev_id }}">
-                            <i class="fas fa-code mr-1"></i> Skills
+                    <li class="nav-item mx-1">
+                        <a class="nav-link px-3 py-2" data-toggle="tab" href="#skills{{ $s->dev_id }}">
+                            <i class="fas fa-code mr-2"></i> Skills
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#resume{{ $s->dev_id }}">
-                            <i class="fas fa-file-alt mr-1"></i> Resume
+                    <li class="nav-item mx-1">
+                        <a class="nav-link px-3 py-2" data-toggle="tab" href="#resume{{ $s->dev_id }}">
+                            <i class="fas fa-file-alt mr-2"></i> Resume
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#portfolio{{ $s->dev_id }}">
-                            <i class="fas fa-briefcase mr-1"></i> Portfolio
+                    <li class="nav-item mx-1">
+                        <a class="nav-link px-3 py-2" data-toggle="tab" href="#portfolio{{ $s->dev_id }}">
+                            <i class="fas fa-briefcase mr-2"></i> Portfolio
                         </a>
                     </li>
                 </ul>
                 
                 <!-- Tab Content -->
-                <div class="tab-content">
+                <div class="tab-content px-2">
                     <!-- About Tab -->
                     <div class="tab-pane fade show active" id="about{{ $s->dev_id }}">
-                        <div class="detail-item">
-                            <div class="detail-label">About Me</div>
-                            <div class="detail-value">{!! $s->description !!}</div>
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary mb-3"><i class="fas fa-info-circle mr-2"></i>About Me</h5>
+                                <div class="card-text">{!! $s->description !!}</div>
+                            </div>
                         </div>
                         
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-label">Availability</div>
-                                    <div class="detail-value">
-                                        <i class="far fa-calendar-alt mr-1 text-muted"></i>
-                                        {{ $s->available_start_date }} to {{ $s->available_end_date }}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="icon-circle bg-light-primary text-primary me-3">
+                                                <i class="far fa-calendar-alt"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Availability</h6>
+                                                <p class="text-muted mb-0">{{ $s->available_start_date }} to {{ $s->available_end_date }}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-label">Total Hours</div>
-                                    <div class="detail-value">
-                                        <i class="far fa-clock mr-1 text-muted"></i>
-                                        {{ $s->total_hours }} hours
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="icon-circle bg-light-primary text-primary me-3">
+                                                <i class="far fa-clock"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Total Hours</h6>
+                                                <p class="text-muted mb-0">{{ $s->total_hours }} hours</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-label">Rate</div>
-                                    <div class="detail-value">
-                                        <i class="fas fa-dollar-sign mr-1 text-muted"></i>
-                                        ${{ $s->perhr }}/hr
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="icon-circle bg-light-primary text-primary me-3">
+                                                <i class="fas fa-dollar-sign"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Rate</h6>
+                                                <p class="text-muted mb-0">${{ $s->perhr }}/Monthly</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-label">Education</div>
-                                    <div class="detail-value">
-                                        <i class="fas fa-graduation-cap mr-1 text-muted"></i>
-                                        {{ $s->education }}
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="icon-circle bg-light-primary text-primary me-3">
+                                                <i class="fas fa-graduation-cap"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Education</h6>
+                                                <p class="text-muted mb-0">{{ $s->education }}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-label">Languages</div>
-                                    <div class="detail-value">
-                                        <i class="fas fa-language mr-1 text-muted"></i>
-                                        {{ $s->language }}
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="icon-circle bg-light-primary text-primary me-3">
+                                                <i class="fas fa-language"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Languages</h6>
+                                                <p class="text-muted mb-0">{{ $s->language }}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-label">Status</div>
-                                    <div class="detail-value">
-                                        <span class="status-badge status-{{ $s->developer_status == 'Active' ? 'active' : 'inactive' }}">
-                                            {{ $s->developer_status }}
-                                        </span>
+                            
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="icon-circle bg-light-primary text-primary me-3">
+                                                <i class="fas fa-user-check"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">Status</h6>
+                                                <p class="mb-0">
+                                                    <span class="badge bg-{{ $s->developer_status == 'Active' ? 'success' : 'secondary' }}">
+                                                        {{ $s->developer_status }}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <div class="detail-item">
-                                    <div class="detail-label">Completed Jobs</div>
-                                    <div class="detail-value">{!! $s->completed_job !!}</div>
-                                </div>
+                        </div>
+                        
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary mb-3"><i class="fas fa-tasks mr-2"></i>Completed Jobs</h5>
+                                <div class="card-text">{!! $s->completed_job !!}</div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Skills Tab -->
                     <div class="tab-pane fade" id="skills{{ $s->dev_id }}">
-                        <div class="detail-item">
-                            <div class="detail-label">Technical Skills</div>
-                            <div class="detail-value">
-                                @if($s->skills)
-                                    @foreach(explode(',', $s->skills) as $skill)
-                                        <span class="skill-tag">{{ trim($skill) }}</span>
-                                    @endforeach
-                                @else
-                                    <span class="text-muted">No skills added</span>
-                                @endif
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary mb-3"><i class="fas fa-code mr-2"></i>Technical Skills</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    @if($s->skills)
+                                        @foreach(explode(',', $s->skills) as $skill)
+                                            <span class="skill-badge bg-light-primary text-primary px-3 py-2 rounded-pill">
+                                                {!! trim($skill) !!}
+                                            </span>
+                                        @endforeach
+                                    @else
+                                        <div class="alert alert-light w-100 text-center">
+                                            No skills added yet
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Resume Tab -->
                     <div class="tab-pane fade" id="resume{{ $s->dev_id }}">
-                        <div class="detail-item">
-                            <div class="detail-label">Resume</div>
-                            <div class="detail-value">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body text-center py-5">
                                 @if($s->resume)
-                                <a href="{{ asset('public/upload/resume/'.$s->resume) }}" 
-                                   target="_blank" class="btn btn-primary">
-                                    <i class="fas fa-download mr-2"></i> Download Resume
-                                </a>
+                                <div class="resume-container">
+                                    <i class="fas fa-file-pdf text-danger display-4 mb-3"></i>
+                                    <h5 class="mb-3">Download Resume</h5>
+                                    <p class="text-muted mb-4">Click the button below to download my professional resume</p>
+                                    <a href="{{ asset('public/upload/resume/'.$s->resume) }}" 
+                                       target="_blank" class="btn btn-primary px-4 py-2">
+                                        <i class="fas fa-download mr-2"></i> Download Resume
+                                    </a>
+                                </div>
                                 @else
-                                <span class="text-muted">No resume uploaded</span>
+                                <div class="no-resume">
+                                    <i class="fas fa-file-excel text-muted display-4 mb-3"></i>
+                                    <h5 class="mb-3">No Resume Uploaded</h5>
+                                    <p class="text-muted">This developer hasn't uploaded a resume yet</p>
+                                </div>
                                 @endif
                             </div>
                         </div>
@@ -692,43 +764,172 @@
                     
                     <!-- Portfolio Tab -->
                     <div class="tab-pane fade" id="portfolio{{ $s->dev_id }}">
-                        <div class="detail-item">
-                            <div class="detail-label">Portfolio</div>
-                            <div class="detail-value">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary mb-4"><i class="fas fa-briefcase mr-2"></i>Portfolio</h5>
                                 @if($s->portfolio_image)
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="card">
-                                            <img src="{{ asset('public/upload/portfolio/'.$s->portfolio_image) }}" 
-                                                 class="card-img-top" alt="Portfolio Item">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card portfolio-card h-100 border-0 shadow-sm overflow-hidden">
+                                            <div class="portfolio-image-container">
+                                                <img src="{{ asset('public/upload/portfolio/'.$s->portfolio_image) }}" 
+                                                     class="card-img-top" alt="Portfolio Item">
+                                            </div>
                                             <div class="card-body">
                                                 <h6 class="card-title">Project Sample</h6>
-                                                <a href="{{ asset('public/upload/portfolio/'.$s->portfolio_image) }}" 
-                                                   target="_blank" class="btn btn-sm btn-outline">
-                                                    <i class="fas fa-external-link-alt mr-1"></i> View
-                                                </a>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <a href="{{ asset('public/upload/portfolio/'.$s->portfolio_image) }}" 
+                                                       target="_blank" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-external-link-alt mr-1"></i> View Full Size
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 @else
-                                <span class="text-muted">No portfolio items uploaded</span>
+                                <div class="text-center py-5">
+                                    <i class="fas fa-images text-muted display-4 mb-3"></i>
+                                    <h5 class="mb-3">No Portfolio Items</h5>
+                                    <p class="text-muted">This developer hasn't uploaded any portfolio items yet</p>
+                                </div>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-outline" data-dismiss="modal">Close</button>
-                <a href="{{ route('developer_profile_update_details') }}" class="btn btn-primary">
-                    <i class="fas fa-edit mr-1"></i> Edit Profile
+            
+            <!-- Modal Footer -->
+            <div class="modal-footer bg-light border-top">
+                <button type="button" class="btn btn-outline-secondary px-4" data-dismiss="modal">
+                    <i class="fas fa-times mr-2"></i> Close
+                </button>
+                <a href="{{ route('developer_profile_update_details') }}" class="btn btn-primary px-4">
+                    <i class="fas fa-edit mr-2"></i> Edit Profile
                 </a>
             </div>
         </div>
     </div>
 </div>
 @endforeach
+
+<style>
+    /* Custom Styles */
+    .profile-header {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cover-photo {
+        width: 100%;
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .avatar-container {
+        position: absolute;
+        left: 50%;
+        top: 60px;
+        transform: translateX(-50%);
+        z-index: 2;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+    }
+    
+    .icon-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .bg-light-primary {
+        background-color: rgba(103, 114, 229, 0.1);
+    }
+    
+    .text-light-primary {
+        color: rgba(103, 114, 229, 0.1);
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.25rem;
+    }
+    
+    .status-active {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+    
+    .status-inactive {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+    
+    .skill-badge {
+        display: inline-block;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+    
+    .skill-badge:hover {
+        background-color: #6772e5 !important;
+        color: white !important;
+        transform: translateY(-2px);
+    }
+    
+    .portfolio-card {
+        transition: transform 0.3s;
+    }
+    
+    .portfolio-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .portfolio-image-container {
+        height: 180px;
+        overflow: hidden;
+    }
+    
+    .portfolio-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s;
+    }
+    
+    .portfolio-card:hover .portfolio-image-container img {
+        transform: scale(1.05);
+    }
+    
+    .nav-pills .nav-link.active {
+        background-color: #6772e5;
+        box-shadow: 0 4px 6px rgba(103, 114, 229, 0.3);
+    }
+    
+    .nav-pills .nav-link {
+        color: #495057;
+        transition: all 0.3s;
+    }
+    
+    .nav-pills .nav-link:hover {
+        color: #6772e5;
+    }
+</style>
 
 <!-- Availability Modal -->
 @foreach($details as $s)

@@ -32,7 +32,8 @@ class frontController extends Controller
     	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
         $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
         $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
-        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->paginate(8);
+        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+        $show['higher_professional_show'] = DB::table('higher_professional_tb')->orderby('id','desc')->paginate(8);
 
         $show['web_details'] = DB::table('web_setting')->get();
 
