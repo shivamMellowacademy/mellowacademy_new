@@ -247,7 +247,7 @@
 
                                     </form>
 
-                                    <ol id="autosearchResult" style="background-color:white;z-index: 1030;position: fixed;left: 193px;width: 27%;line-height:30px;list-style-type: none;font-size:13px;">
+                                    <ol id="autosearchResult" style="background-color:white;z-index: 1030;position: fixed;line-height:30px;font-size:13px;">
 
                                  
 
@@ -546,11 +546,11 @@
 
                                 <div class="form-group">
 
-                                    <input type="text" class="form-control" id="exampleInputEmail1" name="phone" placeholder="Mobile Number / Email Address">
+                                    <input type="text" class="form-control" id="exampleInputEmail1" name="email_login" placeholder="Email Address">
 
-                                    @if ($errors->has('phone'))
+                                    @if ($errors->has('email_login'))
 
-                                        <strong class="text-danger">{{ $errors->first('phone') }}</strong>                                   
+                                        <strong class="text-danger">{{ $errors->first('email_login') }}</strong>                                   
 
                                     @endif
 
@@ -558,11 +558,11 @@
 
                                 <div class="form-group">
 
-                                    <input type="password" class="form-control" id="showpassword" name="password" placeholder="Password">
+                                    <input type="password" class="form-control" id="showpassword" name="password_login" placeholder="Password">
 
-                                    @if ($errors->has('password'))
+                                    @if ($errors->has('password_login'))
 
-                                        <strong class="text-danger">{{ $errors->first('password') }}</strong>                                   
+                                        <strong class="text-danger">{{ $errors->first('password_login') }}</strong>                                   
 
                                     @endif
 

@@ -548,3 +548,4 @@ Route::get('export','App\Http\Controllers\Mycontroller@export')->name('export');
 */
 
 Route::post('submit_chat','App\Http\Controllers\ChatController@submit_chat')->name('submit_chat');
+Route::get('test','App\Http\Controllers\userController@test');

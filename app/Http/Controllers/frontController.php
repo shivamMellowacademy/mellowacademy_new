@@ -658,18 +658,39 @@ class frontController extends Controller
     {   
         $usersearch = $request->post('usersearch');
 
-        $data = DB::table('product_tb')->where( 'name', 'LIKE', '%' . $usersearch . '%')->orderby('id','desc')->get();
+        // Search products
+        $products = DB::table('product_tb')
+                    ->where('name', 'LIKE', '%' . $usersearch . '%')
+                    ->orderBy('id', 'desc')
+                    ->get();
 
-        foreach ($data as $dd) 
-        {       
-            $url = route('product_details',['id'=>''.$dd->id.'']);
-            $output='<a href="'.$url.'"><li style="text-align: left;font-size: 10;" value="'.$dd->id.'">'.$dd->name.'</li></a>'; 
-            echo $output; 
+        // Search developers
+        $developers = DB::table('developer_details_tb')
+                    ->where('name', 'LIKE', '%' . $usersearch . '%')
+                    ->orWhere('skills', 'LIKE', '%' . $usersearch . '%')
+                    ->orderBy('dev_id', 'desc')
+                    ->get();
 
-            // $output = $dd->name ; 
-            // echo $output; 
+        $output = '';
+
+        // Add products to results
+        foreach ($products as $product) {
+            $url = route('product_details', ['id' => $product->id]);
+            $output .= '<a href="'.$url.'"><li class="search-result-item" data-type="product"><i class="fa fa-shopping-bag mr-2"></i> '.$product->name.'</li></a>';
         }
-          
+
+        // Add developers to results
+        foreach ($developers as $developer) {
+            $url = url('developer_detail/'.$developer->dev_id);
+            $output .= '<a href="'.$url.'"><li class="search-result-item" data-type="developer"><i class="fa fa-code mr-2"></i> '.$developer->name.' (Developer)</li></a>';
+        }
+
+        // If no results found
+        if(empty($products) && empty($developers)) {
+            $output = '<li class="no-results">No results found for "'.$usersearch.'"</li>';
+        }
+
+        echo $output;
     }
 
     public function developer_rating_details($dev_id)

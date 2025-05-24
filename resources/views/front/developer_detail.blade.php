@@ -241,11 +241,11 @@
                     <!-- Portfolio Download -->
                     <div class="sidebar-card portfolio-card">
                         @foreach($deve as $d)
-                        <div class="portfolio-preview">
+                        <!-- <div class="portfolio-preview">
                             <img src="{{ URL::asset('public/upload/portfolio/'.$d->portfolio_image.'') }}" alt="Portfolio Preview">
-                        </div>
+                        </div> -->
                         <a href="{{route('resume_download', $d->dev_id)}}" class="btn btn-download">
-                            <i class="fa fa-download"></i> Download Portfolio
+                            <i class="fa fa-download" style="color:#fff"></i> Download Portfolio
                         </a>
                         @endforeach
                     </div>

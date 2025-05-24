@@ -134,9 +134,20 @@
 }
 </style>
 <div class="employer-portal" style="margin-top: 100px">
+     
     <!-- Hero Section -->
     <div class="portal-hero bg-gradient-primary">
         <div class="container">
+             @if(session()->has('errmsg'))
+        <div class="container mt-4">
+            <div class="alert alert-{{ session('message') }} alert-dismissible fade show" role="alert">
+                {{ session('errmsg') }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    @endif
             <div class="row align-items-center">
                 <div class="col-lg-6 text-center text-lg-left">
                     <h1 class="display-4 text-white mb-3">Find Your Perfect Candidate</h1>

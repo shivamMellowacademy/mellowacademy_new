@@ -400,7 +400,10 @@ class userController extends Controller
 			}
 		} else {
 			// User not found
-			return view('front/wrong_login')->with($show);
+			 return back()->with([
+				'message' => 'danger',
+				'errmsg' => 'Invalid email/phone or password'
+        	])->withInput();
 		}
 	}
 
@@ -511,104 +514,108 @@ class userController extends Controller
     }
 
     public function payment_initiate(Request $request)
-    {
-    	$show['developer_order_details']=$this->developer_order_data();
-		$show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
-    	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
-        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
-        $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
-        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+	{
+		// Get user and cart data
+		$u_id = Session::get('user_login_id');
+		$tprice = Session::get('tprice');
+		$tax = Session::get('tax_amount');
 
-        $show['web_details'] = DB::table('web_setting')->get();
-        
-        $show['cart_details'] = DB::table('cart_tb')
-        ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
-        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
-        ->whereNull('status')
-        ->get();
+		$cart = DB::table('cart_tb')
+			->select('product_tb.id', 'product_tb.dev_id', 'product_tb.price', 'product_tb.tax', 'cart_tb.id as c_id')
+			->join('product_tb', 'product_tb.id', '=', 'cart_tb.p_id')
+			->whereNull('cart_tb.status')
+			->where('cart_tb.u_id', $u_id)
+			->get();
 
-        $u_id=Session::get('user_login_id'); 
+		if ($cart->isEmpty()) {
+			return redirect()->back()->with(['message' => 'danger', 'errmsg' => 'No items in cart']);
+		}
 
-        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+		// Generate order ID
+		$order_id = rand(1000, 9999);
 
+		try {
+			DB::beginTransaction();
 
-  		$fname = $request->post('fname');
-  		$lname = $request->post('lname');
-		$email = $request->post('email');
-		$phone = $request->post('phone');
-		$company_name = $request->post('company_name');
-		$country = $request->post('country');
-		$state = $request->post('state');
-		$city = $request->post('city');
-		$address_one = $request->post('address_one');
-		$address_two = $request->post('address_two');
-		$code = $request->post('code');
-		$gst = $request->post('gst');
-		
-		$purpose = $request->post('purpose');
+			// Process each cart item
+			foreach ($cart as $c) {
+				// Calculate prices
+				$productTax = ($c->tax / 100) * $c->price;
+				$price = $c->price + $productTax;
+				$original_price = $price - ((30 / 100) * $price);
 
-
-		session(['fname' => $fname]);
-		session(['lname' => $lname]);
-		session(['email' => $email]);
-		session(['phone' => $phone]);
-		session(['company_name' => $company_name]);
-		session(['country' => $country]);
-		session(['state' => $state]);
-		session(['city' => $city]);
-		session(['address_one' => $address_one]);
-		session(['address_two' => $address_two]);
-		session(['code' => $code]);
-		session(['gst' => $gst]);
-		
-		session(['purpose' => $purpose]);
-		
-		$tprice= Session::get('total_price');
+				// Create order record
+				$order_data = [
+					'order_id' => $order_id,
+					'u_id' => $u_id,
+					'fname' => $request->order_data['fname'],
+					'lname' => $request->order_data['lname'],
+					'email' => $request->order_data['email'],
+					'phone' => $request->order_data['phone'],
+					'company_name' => $request->order_data['company_name'] ?? null,
+					'country' => $request->order_data['country'],
+					'state' => $request->order_data['state'],
+					'city' => $request->order_data['city'],
+					'address_one' => $request->order_data['address_one'],
+					'address_two' => $request->order_data['address_two'] ?? null,
+					'code' => $request->order_data['code'],
+					'gst' => $request->order_data['gst'] ?? null,
+					'tax' => $tax,
+					'purpose' => $request->order_data['purpose'] ?? null,
+					'p_id' => $c->id,
+					'tprice' => $tprice,
+					'status' => 'Booked',
+					'payment_status' => 'SUCCESS',
+					'date' => now()->format('Y-m-d')
+				];
 				
-		$final=$tprice;		
-		// Generate random receipt id
-        $receiptId = Str::random(20);        
-        // Create an object of razorpay
-        $api = new Api($this->razorpayId, $this->razorpayKey);
-        // In razorpay you have to convert rupees into paise we multiply by 100
-        // Creating order
-        $order = $api->order->create(array(
-			'receipt' => $receiptId,
-			'amount' => $final * 100,
-			'currency' => 'INR'
-			)
-        );
+				DB::table('order_tb')->insert($order_data);
 
-       request()->validate([
-					'phone' => 'required|digits:10',
-				]);
-        // Return response on payment page
-        $response = [
-			'orderId' => $order['id'],
-			'razorpayId' => $this->razorpayId,
-			'currency' => 'INR',
-			'amount' => $final,			
-			'fname' =>$fname,
-			'lname' =>$lname,             
-			'email' => $email,
-			'phone' =>$phone,
-			'company_name' =>$company_name,
-			'country' =>$country,
-			'state' =>$state,
-			'city' =>$city,
-			'address_one' =>$address_one,
-			'address_two' =>$address_two,
-			'code' =>$code,
-			'gst' =>$gst,
-			'purpose' =>$purpose,
-			'description' => 'Buy Plan Payment',
-        ];
-        // Let's checkout payment page is it working	
-	return view('front/payment',compact('response'))->with($show);
-    }
+				// Update cart status
+				DB::table('cart_tb')
+					->where('id', $c->c_id)
+					->update(['status' => 'Order']);
+
+				// Create wallet record
+				$wallet_data = [
+					'order_id' => $order_id,
+					'total_price' => $price,
+					'original_price' => $tprice,
+					'p_id' => $c->id,
+					'u_id' => $u_id,
+					'dev_id' => $c->dev_id,
+					'transaction_status' => 0,
+				];
+				
+				DB::table('wallet_tb')->insert($wallet_data);
+			}
+
+			// Create payment record (once per order, not per item)
+			$payment_data = [
+				'order_id' => $order_id,
+				'tprice' => $tprice,
+				'razorpay_payment_id' => $request->razorpay_payment_id,
+				'date' => now()->format('Y-m-d')
+			];
+			
+			DB::table('payment_tb')->insert($payment_data);
+
+			DB::commit();
+
+			// Prepare and send emails (only once per order)
+			
+
+			 return response()->json([
+				'success' => true,
+				'redirect' => route('thank_you')
+			]);
+
+		} catch (\Exception $e) {
+			DB::rollBack();
+			\Log::error('Payment processing failed: ' . $e->getMessage());
+			return redirect()->back()->with(['message' => 'danger', 'errmsg' => 'Order processing failed']);
+		}
+	}
 	
 
 	public function checkout(Request $request)
@@ -700,7 +707,7 @@ class userController extends Controller
 					$payment_data=array(
 					'order_id'=>$order_id,
 					'tprice'=>$tprice,
-					'razorpay_payment_id'=>$request->all()['rzp_paymentid'],
+					'razorpay_payment_id'=> $request->all()['rzp_paymentid'],
 					'date' => date("Y-m-d")
 					);	
 
@@ -1232,40 +1239,53 @@ class userController extends Controller
     }
 
     public function search(Request $request)
-    {
-    	$show['developer_order_details']=$this->developer_order_data();
-        $show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
-        $show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
-        $show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
-        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+	{
+		$show['developer_order_details'] = $this->developer_order_data();
+		$show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+		$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+		$show['banner'] = DB::table('banner_tb')->orderby('id','desc')->get();
+		$show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+		$show['web_details'] = DB::table('web_setting')->get();
+		$show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+		
+		$show['cart_details'] = DB::table('cart_tb')
+			->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+			->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+			->whereNull('status')
+			->get();
 
-        $show['web_details'] = DB::table('web_setting')->get();
+		$u_id = Session::get('user_login_id'); 
 
-        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
-       $show['cart_details'] = DB::table('cart_tb')
-        ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
-        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
-        ->whereNull('status')
-        ->get();
+		$show['cart_empty'] = DB::table('cart_tb')->where('status', '=', Null)->where('u_id', '=', $u_id)->count();
+		$show['cart_value'] = DB::table('cart_tb')->where('status', '=', Null)->where('u_id', '=', $u_id)->count();
+		$show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status', '=', Null)->where('u_id', '=', $u_id)->count();
+		$show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status', '=', Null)->where('u_id', '=', $u_id)->count();
 
-        $u_id=Session::get('user_login_id'); 
-
-        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
-
-       $usersearch = $request->post('usersearch'); 
-       if(empty($usersearch))
-       {
-            return redirect()->back();
-       }else{
-      
-       		$show['search'] = DB::table('product_tb')->where( 'name', 'LIKE', '%' . $usersearch . '%')->orderby('id','desc')->get();
-       		$show['search_total'] = DB::table('product_tb')->where( 'name', 'LIKE', '%' . $usersearch . '%')->orderby('id','desc')->count();
-       		return view('front/search_result')->with($show);
-	   }    	     
-    }
+		$usersearch = $request->post('usersearch'); 
+		if(empty($usersearch)) {
+			return redirect()->back();
+		} else {
+			// Search for products
+			$show['search_products'] = DB::table('product_tb')
+				->where('name', 'LIKE', '%' . $usersearch . '%')
+				->orderby('id','desc')
+				->get();
+			$show['search_products_total'] = $show['search_products']->count();
+			
+			// Search for developers
+			$show['search_developers'] = DB::table('developer_details_tb')
+				->where('name', 'LIKE', '%' . $usersearch . '%')
+				->orWhere('skills', 'LIKE', '%' . $usersearch . '%')
+				->orWhere('description', 'LIKE', '%' . $usersearch . '%')
+				->get();
+			$show['search_developers_total'] = $show['search_developers']->count();
+			
+			$show['search_total'] = $show['search_products_total'] + $show['search_developers_total'];
+			$show['search_query'] = $usersearch;
+			
+			return view('front/search_result')->with($show);
+		}     
+	}
 
     public function higher_professional()
     {  
@@ -1298,30 +1318,64 @@ class userController extends Controller
     {  
     	$show['developer_order_details']=$this->developer_order_data();
     	$orderedDevIds = DB::table('developer_order_tb')
-    ->pluck('dev_id');
+		->pluck('dev_id');
 
-$show['developer_details'] = DB::table('developer_details_tb')
-    ->select(
-        'higher_professional_tb.id as ids',
-        'higher_professional_tb.heading',
-        'developer_details_tb.dev_id',
-        'developer_details_tb.pro_id',
-        'developer_details_tb.name',
-        'developer_details_tb.description',
-        'developer_details_tb.image',
-        'developer_details_tb.phone',
-        'developer_details_tb.email',
-        'developer_details_tb.job',
-        'developer_details_tb.perhr',
-        'developer_details_tb.rating'
-    )
-    ->join('higher_professional_tb', 'higher_professional_tb.id', '=', 'developer_details_tb.pro_id')
-    ->where('developer_details_tb.pro_id', $id)
-    ->where('developer_details_tb.login_status', 1)
-    ->whereNotIn('developer_details_tb.dev_id', $orderedDevIds)
-    ->orderBy('developer_details_tb.dev_id', 'desc')
-    ->groupBy('developer_details_tb.dev_id')
-    ->get();
+		// $show['developer_details'] = DB::table('developer_details_tb')
+		// 	->select(
+		// 		'higher_professional_tb.id as ids',
+		// 		'higher_professional_tb.heading',
+		// 		'developer_details_tb.dev_id',
+		// 		'developer_details_tb.pro_id',
+		// 		'developer_details_tb.name',
+		// 		'developer_details_tb.description',
+		// 		'developer_details_tb.image',
+		// 		'developer_details_tb.phone',
+		// 		'developer_details_tb.email',
+		// 		'developer_details_tb.job',
+		// 		'developer_details_tb.perhr',
+		// 		'developer_details_tb.rating'
+		// 	)
+		// 	->join('higher_professional_tb', 'higher_professional_tb.id', '=', 'developer_details_tb.pro_id')
+		// 	->where('developer_details_tb.pro_id', $id)
+		// 	->where('developer_details_tb.login_status', 1)
+		// 	->whereNotIn('developer_details_tb.dev_id', $orderedDevIds)
+		// 	->orderBy('developer_details_tb.dev_id', 'desc')
+		// 	->groupBy('developer_details_tb.dev_id')
+		// 	->get();
+
+		$show['developer_details'] = DB::table('developer_details_tb')
+			->select(
+				'higher_professional_tb.id as ids',
+				'higher_professional_tb.heading',
+				'developer_details_tb.dev_id',
+				'developer_details_tb.pro_id',
+				'developer_details_tb.name',
+				'developer_details_tb.description',
+				'developer_details_tb.image',
+				'developer_details_tb.phone',
+				'developer_details_tb.email',
+				'developer_details_tb.job',
+				'developer_details_tb.perhr',
+				'developer_details_tb.rating',
+				DB::raw('CASE WHEN developer_payments.id IS NOT NULL AND 
+						(developer_payments.expired IS NULL OR developer_payments.expired >= CURDATE()) 
+						THEN 1 ELSE 0 END as is_premium')
+			)
+			->join('higher_professional_tb', 'higher_professional_tb.id', '=', 'developer_details_tb.pro_id')
+			->leftJoin('developer_payments', function($join) {
+				$join->on('developer_payments.developer_id', '=', 'developer_details_tb.dev_id')
+					->where(function($query) {
+						$query->whereNull('developer_payments.expired')
+							->orWhere('developer_payments.expired', '>=', DB::raw('CURDATE()'));
+					});
+			})
+			->where('developer_details_tb.pro_id', $id)
+			->where('developer_details_tb.login_status', 1)
+			->whereNotIn('developer_details_tb.dev_id', $orderedDevIds)
+			->orderBy('is_premium', 'desc') // Premium developers first
+			->orderBy('developer_details_tb.dev_id', 'desc')
+			->groupBy('developer_details_tb.dev_id')
+			->get();
 
     	$show['developer'] = DB::table('developer_details_tb')
     	->select('higher_professional_tb.id as ids','higher_professional_tb.heading','developer_details_tb.dev_id','developer_details_tb.pro_id','developer_details_tb.name','developer_details_tb.description','developer_details_tb.image','developer_details_tb.phone','developer_details_tb.email','developer_details_tb.job','developer_details_tb.perhr','developer_details_tb.rating')
@@ -1745,7 +1799,7 @@ $show['developer_details'] = DB::table('developer_details_tb')
         $show['web_details'] = DB::table('web_setting')->get();
         $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
         $show['cart_details'] = DB::table('cart_tb')
-        ->select('product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->select('product_tb.id as pro_id','product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
         ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
         ->whereNull('status')
         ->get();
@@ -1761,4 +1815,13 @@ $show['developer_details'] = DB::table('developer_details_tb')
 
 		return view('front/cart')->with($show);
     }
+
+	function test()
+	{
+		return DB::table('developer_details_tb')
+        ->join('developer_order_tb', 'developer_order_tb.dev_id', '=', 'developer_details_tb.dev_id')
+        ->join('user_login', 'user_login.id', '=', 'developer_order_tb.u_id')
+		->where('current_ctc', '!=' , null)
+        ->get();
+	}
 }

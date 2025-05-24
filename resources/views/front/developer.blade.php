@@ -40,7 +40,7 @@
                                     <span class="badge badge-warning"><i class="fa fa-star"></i> {{ $dev->rating }}/5</span>
                                     <small class="text-muted">({{ $dev->job }} Jobs)</small>
                                 </div>
-                                <p class="mb-3"><span class="badge badge-success">INR {{ $dev->perhr }}/Month</span></p>
+                                <p class="mb-3"><span class="badge badge-success" style="font-size: medium;">₹{{ number_format($dev->perhr, 2) }} / Month</span></p>
                                 <a href="{{ $url }}" class="btn btn-outline-primary btn-sm">View Profile</a>
                             </div>
                         </div>
