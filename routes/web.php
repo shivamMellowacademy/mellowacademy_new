@@ -548,4 +548,14 @@ Route::get('export','App\Http\Controllers\Mycontroller@export')->name('export');
 */
 
 Route::post('submit_chat','App\Http\Controllers\ChatController@submit_chat')->name('submit_chat');
-Route::get('test','App\Http\Controllers\userController@test');
+
+
+
+Route::get('payment','App\Http\Controllers\userController@payment');
+Route::get('/pay-advance/{order_id}}', 'App\Http\Controllers\userController@processAdvance')->name('payment.advance');
+Route::post('/verify-payment', 'App\Http\Controllers\userController@verifyPayment')->name('verify.payment');
+
+
+Route::get('/check-monthly-payments', 'App\Http\Controllers\userController@checkMonthlyPayments')->name('check.monthly.payments');
+Route::get('/pay-salary-payment/{id}', 'App\Http\Controllers\userController@processSalaryPayment')->name('pay.salary.payment');
+Route::post('/verify-salary-payment', 'App\Http\Controllers\userController@verifySalaryPayment')->name('verify.salary.payment');

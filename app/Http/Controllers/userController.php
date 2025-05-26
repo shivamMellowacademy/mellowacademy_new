@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Http;
 use URL;
+use Carbon\Carbon;
+use App\Mail\AdvancePaymentReminder;
+use Illuminate\Support\Facades\Log;
+use App\Mail\SalaryPaymentNotification;
 
 class userController extends Controller
 {
@@ -1816,12 +1820,254 @@ class userController extends Controller
 		return view('front/cart')->with($show);
     }
 
-	function test()
+	function payment()
 	{
-		return DB::table('developer_details_tb')
-        ->join('developer_order_tb', 'developer_order_tb.dev_id', '=', 'developer_details_tb.dev_id')
-        ->join('user_login', 'user_login.id', '=', 'developer_order_tb.u_id')
-		->where('current_ctc', '!=' , null)
+		$unpaidEmployees = DB::table('developer_details_tb')
+			->join('developer_order_tb', 'developer_order_tb.dev_id', '=', 'developer_details_tb.dev_id')
+			->join('user_login', 'user_login.id', '=', 'developer_order_tb.u_id')
+			->whereNotNull('developer_details_tb.current_ctc')
+			->whereRaw('CAST(developer_details_tb.current_ctc AS DECIMAL) != CAST(developer_order_tb.payment_amount AS DECIMAL)')
+			->where('developer_order_tb.payment_date', '<=', Carbon::now()->subDays(7))
+			->select([
+				'user_login.email',
+				DB::raw("CONCAT(COALESCE(user_login.fname, ''), ' ', COALESCE(user_login.lname, '')) AS name"),
+				'developer_details_tb.current_ctc',
+				'developer_order_tb.payment_date',
+				'developer_order_tb.id as order_id',
+				'developer_order_tb.payment_amount'
+			])
+			->get();
+		$show_tax = DB::table('developer_premium_price_table')->first();
+
+		$tax = $show_tax->tax;
+
+
+		foreach ($unpaidEmployees as $employee) {
+			try {
+				// Generate secure payment link
+				$paymentLink = route('payment.advance', [
+					'order_id' => (int)$employee->order_id, 
+				]);
+
+				// Send email
+				Mail::to($employee->email)
+					->send(new AdvancePaymentReminder($employee, $paymentLink, $tax));
+
+				
+				\Log::info("Payment reminder sent to {$employee->email}", [
+					'order_id' => $employee->order_id,
+					'amount_due' => $employee->current_ctc - $employee->payment_amount
+				]);
+				
+			} catch (\Exception $e) {
+				
+				\Log::error("Payment reminder failed for {$employee->email}", [
+					'error' => $e->getMessage(),
+					'order_id' => $employee->order_id,
+					'trace' => $e->getTraceAsString()
+				]);
+			}
+		}
+
+	}
+
+	public function processAdvance($order_id)
+	{
+		$show['developer_order_details']=$this->developer_order_data();
+    	$show['user_details'] = DB::table('user_login')->orderby('id','desc')->get(); 
+    	$show['category'] = DB::table('category_tb')->orderby('id','desc')->get();
+        $show['subcategorys'] = DB::table('subcategory_tb')->orderby('id','asc')->get();
+        $show['web_details'] = DB::table('web_setting')->get();
+        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+        $show['cart_details'] = DB::table('cart_tb')
+        ->select('product_tb.id as pro_id','product_tb.name','product_tb.image','product_tb.tax','product_tb.video','product_tb.price','product_tb.pro_size','product_tb.id','cart_tb.u_id','cart_tb.id','cart_tb.status')
+        ->join('product_tb','product_tb.id', '=', 'cart_tb.p_id')
+        ->whereNull('status')
         ->get();
+		$u_id=Session::get('user_login_id'); 
+        $show['higher_professional'] = DB::table('higher_professional_tb')->orderby('id','desc')->get();
+
+        $show['cart_value'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['cart_empty'] = DB::table('cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_empty'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+        $show['developer_cart_value'] = DB::table('developer_cart_tb')->where('status' ,'=', Null)->where('u_id' ,'=', $u_id )->count();
+
+		// Get order details
+		$show['order'] = DB::table('developer_order_tb as o')
+			->join('developer_details_tb as d', 'o.dev_id', '=', 'd.dev_id')
+			->where('o.id', $order_id)
+			->select([
+				'o.*',
+				'd.name as developer_name',
+				'd.email as developer_email',
+				'd.current_ctc as developer_current_ctc',
+			])
+			->first();
+
+		if (!$show['order']) {
+			return response()->json(['error' => 'Order not found'], 404);
+		}
+
+		$show_tax = DB::table('developer_premium_price_table')->first();
+
+		$show['amountDue'] = $show['order']->developer_current_ctc - $show['order']->payment_amount;
+		$show['tax'] = ($show['amountDue'] * $show_tax->tax) / 100;
+		
+		return view('paymentDueAmount', $show);
+	}
+
+	public function verifyPayment(Request $request)
+	{
+
+		$order = DB::table('developer_order_tb')
+            ->where('id', $request->id)
+            ->first();
+
+		$newTotal = (float)$order->payment_amount + (float)$request->amountDue;
+		$newtax = (float)$order->tax + (float)$request->tax;
+
+        
+        DB::table('developer_order_tb')
+		->where('id', $request->id)
+		->update([
+			'payment_amount' => $newTotal,
+			'tax' => $newtax,
+			'payment_status' => 'completed',
+			'payment_date' => now(),
+		]);
+
+		return response()->json([
+			'success' => true,
+			'message' => 'Payment verified and updated successfully',
+		]);
+
+	}
+
+	public function checkMonthlyPayments($month = null)
+	{
+		$month = $month ?? now()->format('Y-m-01');
+		$nowDate = now()->format('Y-m-d');
+
+		$tax = DB::table('developer_premium_price_table')->first();
+
+		if ($month == $nowDate) {
+			// Process new monthly payments
+			$developerPayments = DB::table('developer_order_tb as o')
+				->join('developer_details_tb as d', 'o.dev_id', '=', 'd.dev_id')
+				->where('o.status', 2)
+				->select([
+					'd.dev_id',
+					'd.name as developer_name',
+					'd.email as developer_email',
+					'd.current_ctc',
+					'o.id',
+					'o.u_id',
+				])
+				->get();
+
+			
+
+			foreach ($developerPayments as $developer) 
+			{
+				if (!empty($developer->current_ctc)) 
+				{
+					$tax_amount = ($developer->current_ctc * $tax->tax) / 100;
+
+					// Insert payment record
+					$paymentId = DB::table('developer_payment_monthly')->insertGetId([
+						'developer_order_id' => $developer->id,
+						'payment_month' => now()->month, // Store as number (1-12)
+						'payment_year' => now()->year,
+						'payment_amount' => $developer->current_ctc,
+						'payment_tax' => $tax_amount,
+						'u_id' => $developer->u_id,
+						'payment_status' => 'unpaid',
+						'created_at' => now(),
+						'updated_at' => now()
+					]);
+				}
+			}
+
+			return response()->json(['message' => 'Monthly payments processed']);
+		} 
+		else 
+		{
+			$records = DB::table('developer_payment_monthly')->where('payment_status', 'unpaid')->groupBy('u_id')->get();
+
+			foreach($records as $val)
+			{
+				// Get and process unpaid payments
+				$unpaidRecords = DB::table('developer_payment_monthly as p')
+				->join('developer_order_tb as o', 'p.developer_order_id', '=', 'o.id')
+				->join('developer_details_tb as d', 'o.dev_id', '=', 'd.dev_id')
+				->join('user_login as us', 'us.id', '=', 'p.u_id')
+				->where('p.u_id', $val->u_id)
+				->select([
+					'p.id',
+					'p.payment_amount',
+					'p.payment_tax',
+					'p.payment_month',
+					'p.payment_year',
+					'd.email as developer_email',
+					'd.name as developer_name',
+					'p.u_id',
+					'us.email as clientEmail',
+				])
+				->get();
+
+				$total_amount = $unpaidRecords->sum('payment_amount');
+				$total_tax = $unpaidRecords->sum('payment_tax');
+
+				Mail::to($unpaidRecords[0]->clientEmail)
+				->send(new SalaryPaymentNotification([
+					'developers' => $unpaidRecords,
+					'amount' => $total_amount,
+					'tax' => $total_tax,
+					'taxRate' => $tax->tax,
+				]));
+			}
+		}
+	}
+
+	public function processSalaryPayment($id)
+	{
+		$show['unpaidRecords'] = DB::table('developer_payment_monthly as p')
+			->join('developer_order_tb as o', 'p.developer_order_id', '=', 'o.id')
+			->join('developer_details_tb as d', 'o.dev_id', '=', 'd.dev_id')
+			->join('user_login as us', 'us.id', '=', 'p.u_id')
+			->where('p.u_id', $id)
+			->select([
+				'p.id',
+				'p.payment_amount',
+				'p.payment_tax',
+				'p.payment_month',
+				'p.payment_year',
+				'd.email as developer_email',
+				'd.name as developer_name',
+				'p.u_id',
+				'us.email as clientEmail',
+			])
+			->get();
+
+		$show['total_amount'] = $show['unpaidRecords']->sum('payment_amount');
+		$show['total_tax'] = $show['unpaidRecords']->sum('payment_tax');
+		$show['u_id'] = optional($show['unpaidRecords']->first())->u_id;
+
+		return view('paymentSalary', $show);
+	}
+
+	public function verifySalaryPayment(Request $request)
+	{
+		$unpaidRecords = DB::table('developer_payment_monthly')
+		->where('u_id', $request->id)
+		->get();
+
+		foreach($unpaidRecords as $val)
+		{
+			DB::table('developer_payment_monthly')->where('id', $val->id)->update([
+				'payment_status' => 'paid',
+				'updated_at' => now()
+			]);
+		}
 	}
 }

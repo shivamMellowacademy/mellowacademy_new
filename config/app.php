@@ -108,6 +108,10 @@ return [
 
     'faker_locale' => 'en_US',
 
+    'currency' => 'INR',
+    'company_address' => '123 Business Rd, Mumbai, India',
+    'company_phone' => '+91 1234567890',
+
     /*
     |--------------------------------------------------------------------------
     | Encryption Key
